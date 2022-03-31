@@ -12,13 +12,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
+```{r, warning=FALSE}
 library(dplyr)
 library(spotifyr)
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
 ```
+
+
 
 ```{r}
 id <- '29dd370f3d934a20999183b22e985a7b'
@@ -27,9 +29,14 @@ Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
 ```
+
+
+
 ```{r}
 drake <- get_artist_audio_features("Drake")
 ```
+
+
 
 ```{r}
 
