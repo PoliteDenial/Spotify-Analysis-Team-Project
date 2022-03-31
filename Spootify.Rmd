@@ -47,5 +47,6 @@ keys
 ```
 
 ```{r}
+print(drake)
 ``
 
