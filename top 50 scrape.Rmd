@@ -15,8 +15,8 @@ library(ggplot2)
 library(lubridate)
 library(readr)
 library(knitr)
-# install.packages("remotes")
-# remotes::install_github("mvkorpel/pickURL")
+#install.packages("remotes")
+#remotes::install_github("mvkorpel/pickURL")
 
 ```
 
@@ -68,11 +68,124 @@ songKeys
 ```
 
 ```{r}
-
-t=get_artist(access_token, access_token)
-t
-
-topFiftyDf = data.frame(songUID = songKeys, get_artist("26wuBc04catG1QQyYupr35", access_token))#, Artist = get_artist(songlinks))
-topFiftyDf
+#topFiftyDf = data.frame(songUID = songKeys, get_artist("26wuBc04catG1QQyYupr35"))#, Artist = get_artist(songlinks))
+#topFiftyDf
 ```
+
+```{r}
+tracks <-   data.frame()
+
+
+for (i in songKeys) {
+  tracks <- rbind(tracks,get_track_audio_features(i))
+}
+
+names<- c()
+for (i in tracks$id){
+  name2<-c(get_tracks(i)[["name"]])
+  names = c(names,name2)
+  
+}
+
+artist_names<- c()
+for (i in tracks$id){
+  name2<-c(get_tracks(i)[["name"]])
+  names = c(names,name2)
+  
+}
+artist_names
+tracks <- tracks %>% mutate(name = unique(names)) %>% relocate(name)
+```
+
+```{r}
+tracks_copy = tracks
+```
+
+```{r}
+get_tracks("26wuBc04catG1QQyYupr35")[[1]]
+
+get_artists(get_tracks("26wuBc04catG1QQyYupr35")[[1]])[["genres"]]
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
