@@ -35,44 +35,50 @@ What this code does is using the raw html from the spotify website it gets the t
 
 ```{r}
 
+id = "zain_elsell"
+
 #This is where the data was taken from:
 url_charts_local = "https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest"
 url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
-
 
 raw_html_file_name = "Local_Pulse_March_28.txt"#For teting 
 htmlVectorRaw = read_file(raw_html_file_name) #vector of every charcter in the
 
 all_links = pickURL::pick_urls(htmlVectorRaw) # picks out all occurrences of links in the raw html code
-
 songlinks= c()
 url_pattern = "https://open.spotify.com/track/"
 
-for(i in 1:length(all_links)){
+for(i in 1:length(all_links))
+  {
   if(str_detect(all_links[i], url_pattern))
   {
     songlinks =c(songlinks, all_links[i])
-    
   }
 }
+
+
 
 
 songKeys = str_replace_all(songlinks, url_pattern, "")
 songKeys
 
 
-# metaData = get_all_vars(data = paste0(songKeys[1]))
-# 
-# metaData
+
 
 ```
 
 ```{r}
 
-t=get_artist(access_token, access_token)
-t
 
-topFiftyDf = data.frame(songUID = songKeys, get_artist("26wuBc04catG1QQyYupr35", access_token))#, Artist = get_artist(songlinks))
-topFiftyDf
+metaData = get_all_audio_features(data = paste0(songKeys[1]))
+metaData
+
+#get_track("26wuBc04catG1QQyYupr35")
+# for(i in length(songKeys)){
+#   trackDf = get_track(songKeys[i]) 
+#   topDf = (topDf, trackDf)
+# }
+# topDf = data.frame()
+# head(topFiftyDf)
 ```
 
