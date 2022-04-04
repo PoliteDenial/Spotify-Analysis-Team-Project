@@ -26,12 +26,11 @@ id ='71e950603dd64e1291d04fabafee04d9'
 secret = '5331da62c4644ee887ff07216c35b183'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
-access_token <- get_spotify_access_token()
+access_token <- get_spotify_access_token() #
 #access_token
 ```
 
 
-What this code does is using the raw html from the spotify website it gets the track IDS of the most uniquely popular songs in Denver, Colorado (only for the week of March 28, 2022) 
 
 ```{r}
 
@@ -40,6 +39,40 @@ p_id = "zain_elsell" #personal id
 # #This is where the control  data was taken from:
 # url_charts_local = "https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest"
 # url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
+
+
+key_to_df <- function(x)#given a vector of song Keys return song information from the spotify API 
+{ 
+  df <- data.frame()
+  
+  for (i in x) 
+  {
+    df <- rbind(df,get_track_audio_features(i))
+  }
+  
+  names<- c()
+  for (i in df$id){
+    name2<-c(get_tracks(i)[["name"]])
+    names = c(names,name2)
+  }
+  
+  artist_names<- c()
+  for (i in df$id){
+    temp <- get_tracks(i)[1]
+    tempdf <- data.frame(temp[[1]])
+    tempname <- tempdf[["name"]][1]
+    artist_names = c(artist_names,tempname)
+  }
+  df <- df %>% mutate(song_name = unique(names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
+  tracks = df
+  
+  tracks <- tracks %>% select(-c(mode,type,uri,	
+  track_href,analysis_url))
+  tracks
+  return(tracks)
+}
+
+
 
 
 scrape_table = function(file_name, keys = 1, links = 0)#params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
@@ -67,53 +100,14 @@ scrape_table = function(file_name, keys = 1, links = 0)#params raw html table cl
 raw_html_file_name = "Local_Pulse_March_28.txt"#For teting use local pulse march 28 so we have control for values to expect
 songKeys = scrape_table(raw_html_file_name)
 
-songKeys
-```
+#songKeys
 
-```{r}
-#topFiftyDf = data.frame(songUID = songKeys, get_artist("26wuBc04catG1QQyYupr35"))#, Artist = get_artist(songlinks))
-#topFiftyDf
-```
+trackDf = key_to_df(songKeys)
 
-```{r}
-tracks <-   data.frame()
-
-for (i in songKeys) {
-  tracks <- rbind(tracks,get_track_audio_features(i))
-}
-
-names<- c()
-for (i in tracks$id){
-  name2<-c(get_tracks(i)[["name"]])
-  names = c(names,name2)
-  
-}
-
-artist_names<- c()
-for (i in tracks$id){
-  name2<-c(get_tracks(i)[["name"]])
-  names = c(names,name2)
-  
-}
-artist_names
-tracks <- tracks %>% mutate(name = unique(names)) %>% relocate(name)
-```
-
-```{r}
-tracks_copy = tracks
-
-metaData = get_all_audio_features(data = paste0(songKeys[1]))
-metaData
-
-#get_track("26wuBc04catG1QQyYupr35")
-# for(i in length(songKeys)){
-#   trackDf = get_track(songKeys[i]) 
-#   topDf = (topDf, trackDf)
-# }
-# topDf = data.frame()
-# head(topFiftyDf)
 
 ```
+
+
 
 ```{r}
 get_tracks("26wuBc04catG1QQyYupr35")[[1]]
