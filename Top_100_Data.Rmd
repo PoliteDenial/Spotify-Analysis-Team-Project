@@ -27,7 +27,7 @@ secret = '5331da62c4644ee887ff07216c35b183'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
-access_token
+#access_token
 ```
 
 
@@ -35,36 +35,39 @@ What this code does is using the raw html from the spotify website it gets the t
 
 ```{r}
 
-id = "zain_elsell"
+p_id = "zain_elsell" #personal id
 
-#This is where the data was taken from:
-url_charts_local = "https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest"
-url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
+# #This is where the control  data was taken from:
+# url_charts_local = "https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest"
+# url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
 
-raw_html_file_name = "Local_Pulse_March_28.txt"#For teting 
-htmlVectorRaw = read_file(raw_html_file_name) #vector of every charcter in the
 
-all_links = pickURL::pick_urls(htmlVectorRaw) # picks out all occurrences of links in the raw html code
-songlinks= c()
-url_pattern = "https://open.spotify.com/track/"
+scrape_table = function(file_name, keys = 1, links = 0)#params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
+{
+  htmlVectorRaw = read_file(file_name) #vector of every charter in the raw html
+  all_links = pickURL::pick_urls(htmlVectorRaw) # picks out all occurrences of links in the raw html code
+  songlinks= c() #blank vector to store just song links
+  url_pattern = "https://open.spotify.com/track/" #track link pattern
 
-for(i in 1:length(all_links))
-  {
-  if(str_detect(all_links[i], url_pattern))
-  {
-    songlinks =c(songlinks, all_links[i])
+  for(i in 1:length(all_links)) #get only song links in all_links
+    {
+      if(str_detect(all_links[i], url_pattern))
+      {
+        songlinks =c(songlinks, all_links[i])
+      }
   }
+  
+  if(keys){songKeys = str_replace_all(songlinks, url_pattern, "")}
+  else if(links){return(songlinks)}
+  else return(songKeys)
+  
 }
 
 
+raw_html_file_name = "Local_Pulse_March_28.txt"#For teting use local pulse march 28 so we have control for values to expect
+songKeys = scrape_table(raw_html_file_name)
 
-
-songKeys = str_replace_all(songlinks, url_pattern, "")
 songKeys
-
-
-
-
 ```
 
 ```{r}
@@ -75,8 +78,6 @@ songKeys
 ```{r}
 tracks <-   data.frame()
 
-
-<<<<<<< HEAD
 for (i in songKeys) {
   tracks <- rbind(tracks,get_track_audio_features(i))
 }
@@ -100,7 +101,6 @@ tracks <- tracks %>% mutate(name = unique(names)) %>% relocate(name)
 
 ```{r}
 tracks_copy = tracks
-=======
 
 metaData = get_all_audio_features(data = paste0(songKeys[1]))
 metaData
@@ -112,7 +112,7 @@ metaData
 # }
 # topDf = data.frame()
 # head(topFiftyDf)
->>>>>>> 52150380560eb2c083652aa64c72a730f432739e
+
 ```
 
 ```{r}
