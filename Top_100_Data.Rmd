@@ -216,6 +216,9 @@ for i in range(iters):
 
 ```
 
+```{r}
+spotifyr::search_spotify("Pepas")
+```
 
 
 
