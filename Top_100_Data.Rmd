@@ -7,21 +7,22 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(spotifyr)
-library(stringr)
-library(dplyr)
-library(ggplot2)
-library(lubridate)
-library(readr)
-library(knitr)
-#install.packages("remotes")
+library(tidyverse)#tidy
+library(spotifyr)#spotify web api wrapper class
+library(stringr)#string processing
+library(ggplot2)#ggplot for testing
+library(lubridate) #dates
+library(readr) #text file reading
+library(knitr) #live knit files
+library(reticulate) #python cells and interaction with R requires miniConda
+#install.packages("remotes") #
 #remotes::install_github("mvkorpel/pickURL")
 
 ```
 
 
-```{r}
+```{r} 
+#spotify api wrapper class stuff 
 id ='71e950603dd64e1291d04fabafee04d9'
 secret = '5331da62c4644ee887ff07216c35b183'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
@@ -75,12 +76,13 @@ key_to_df <- function(x)#given a vector of song Keys return song information fro
 
 
 
-scrape_table = function(file_name, keys = 1, links = 0)#params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
+scrape_table = function(file_name, keys = 1, links = 0, keysWdates = 0)#params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
 {
   htmlVectorRaw = read_file(file_name) #vector of every charter in the raw html
   all_links = pickURL::pick_urls(htmlVectorRaw) # picks out all occurrences of links in the raw html code
   songlinks= c() #blank vector to store just song links
   url_pattern = "https://open.spotify.com/track/" #track link pattern
+  datePattern = "SDate:"
 
   for(i in 1:length(all_links)) #get only song links in all_links
     {
@@ -90,8 +92,11 @@ scrape_table = function(file_name, keys = 1, links = 0)#params raw html table cl
       }
   }
   
+  
+  
   if(keys){songKeys = str_replace_all(songlinks, url_pattern, "")}
   else if(links){return(songlinks)}
+  else if(keysWdates){}
   else return(songKeys)
   
 }
@@ -110,13 +115,114 @@ trackDf = key_to_df(songKeys)
 
 
 ```{r}
-get_tracks("26wuBc04catG1QQyYupr35")[[1]]
+F_Scrape_day = "2022-03-18"
+I_Scrape_day = "2021-01-01"
+openTag = '<table cellpadding="12" class="Table__TableElement-evwssh-0 eAsZoj ChartsTable__StyledTable-sc-1ye7294-5 iQeNyw"><colgroup><col width="48px"><col width="5%"><colwidth="64%">'
+closeTag = '</table>'
+dateSeq = seq.Date(from = as.Date(I_Scrape_day), to = as.Date(F_Scrape_day), by = 'weeks') # base 
+length(dateSeq)
+```
 
-get_artists(get_tracks("26wuBc04catG1QQyYupr35")[[1]])[["genres"]]
+
+
+```{python}
+import pyautogui as pygui
+import win32clipboard
+import sys
+```
+
+```{python}
+  print('Press Ctrl-C to quit.')
+try:
+    while True:
+        x, y = pygui.position()
+        positionStr = 'X: ' + str(x).rjust(4) + ' Y: ' + str(y).rjust(4)
+        print(positionStr, end='')
+        print('\b' * len(positionStr), end='', flush=True)
+except KeyboardInterrupt:
+    print('\n')
 
 ```
 
 
+```{python}
+
+
+def pasteToFile(filename = "Autodata.txt"):
+  
+  f=open(filename, "a", encoding="utf-8")
+  win32clipboard.OpenClipboard()
+  data = win32clipboard.GetClipboardData()
+  cdata= "\n\n\n"+ str(data) 
+  if(cdata != None):
+    print("got data!\n")  
+  f.write(cdata)
+  win32clipboard.CloseClipboard()
+  f.close()
+
+def copyTable():
+  pygui.moveTo(161, 787)
+  pygui.click(button = 'right')
+  pygui.moveTo(161, 767)
+  pygui.click(button = 'left')
+  pygui.moveTo(1282, 380,duration = 0.5)
+  pygui.click(button = 'right')
+  pygui.moveTo(1282, 528,duration = 0.5)
+  pygui.moveTo(1382, 528,duration = 0.5)
+  pygui.moveTo(1582, 528,duration = 0.5)
+  pygui.click(button = 'left')
+
+
+
+def update_x(x):
+  x_min = 230
+  x_max = 540
+  if(x > x_min and x < x_max):
+    x=- 300
+  else:
+    x= x_max
+  return x
+  
+def update_y(y):
+  y_min = 590
+  y_max = 760
+  if(y > y_min and y < y_max):
+    y= y - 35
+  if(y < y_min):
+    y = y_max
+  return y
+
+
+
+
+def selectPrevWeek(x,y):
+  pygui.moveTo(279,331, duration = 0.5)
+  pygui.scroll(-500)
+  pygui.click(button = 'left', duration =0.6)
+  pygui.moveTo(540,y, duration = 0.5)
+  pygui.click(button = 'left')
+  pygui.hotkey('ctrl','r')  
+
+
+
+```
+
+
+```{python}
+
+x= 540
+y= 755 # or 760
+
+
+iters=5
+for i in range(iters):
+  copyTable()
+  pasteToFile('AutoData.txt')
+  selectPrevWeek(x,y)
+  y = update_y(y)
+  
+
+```
 
 
 
