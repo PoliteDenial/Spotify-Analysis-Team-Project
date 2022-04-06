@@ -42,7 +42,6 @@ p_id = "zain_elsell"  # personal id
 # url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
 
 # ---------------------------------------------------------------------------------------------
-#Takes a list of song ID's and adds them to a Data Frame
 key_to_df <-function(x){
     df <-data.frame()
     names <- c()
@@ -82,7 +81,10 @@ scrape_table = function(file_name, keys=1, links=0, keysWdates=0)
 
     for(i in 1: length(all_links)){  # get only song links in all_links
         if(str_detect(all_links[i], url_pattern))
-        {songlinks = c(songlinks, all_links[i])}}
+        {
+            songlinks = c(songlinks, all_links[i])
+        }
+    }
 
 
 
@@ -99,6 +101,7 @@ raw_html_file_name = "Local_Pulse_March_28.txt"
 songKeys = scrape_table(raw_html_file_name)
 
 trackDf = key_to_df(songKeys)
+
 ```
 
 
@@ -214,11 +217,27 @@ for i in range(iters):
 ```
 
 ```{r}
-tracksDf_copy = trackDf
-tracksDf_copy$duration_ms <- tracksDf_copy$duration_ms %>% lubridate::dmilliseconds() #lubridate::
-
-tracksDf_copy
+spotifyr::search_spotify("Pepas")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

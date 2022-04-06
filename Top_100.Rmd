@@ -29,8 +29,6 @@ access_token <- get_spotify_access_token()
 access_token
 ```
 
-
-Driver Code to put song keys into data frame
 ```{r}
 key_to_df <- function(x){
 df <- data.frame()
@@ -40,17 +38,21 @@ for (i in x) {
 }
 
 names<- c()
-artist_names<- c()
 for (i in df$id){
   name2<-c(get_tracks(i)[["name"]])
   names = c(names,name2)
+  
+}
+
+artist_names<- c()
+for (i in df$id){
   temp <- get_tracks(i)[1]
   tempdf <- data.frame(temp[[1]])
   tempname <- tempdf[["name"]][1]
   artist_names = c(artist_names,tempname)
-}
 
-df <- df %>% mutate(song_name = (names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
+}
+df <- df %>% mutate(song_name = unique(names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
 tracks = df
 
 tracks <- tracks %>% select(-c(mode,type,uri,	
@@ -58,10 +60,6 @@ track_href,analysis_url))
 tracks
 return(tracks)
 }
-```
-
-```{r}
-key_to_df(songKeys)
 ```
 
 What this code does is using the raw html from the spotify website it gets the track IDS of the most uniquely popular songs in Denver, Colorado (only for the week of March 28, 2022) 
