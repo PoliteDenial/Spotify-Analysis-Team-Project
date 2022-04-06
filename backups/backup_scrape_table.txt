@@ -1,0 +1,17 @@
+scrape_table = function(file_name, keys=1, links=0)
+{
+    all_links = pickURL:: pick_urls(read_file(file_name)) # picks out all occurrences of links in the raw html code
+    songlinks = c()  # blank vector to store just song links
+    url_pattern = "https://open.spotify.com/track/"  # track link pattern
+     for(i in 1: length(all_links)){  # get only song links in all_links
+        if(str_detect(all_links[i], url_pattern))
+        {
+            songlinks = c(songlinks, all_links[i])
+        }
+     }
+    if(keys){
+    songKeys = str_replace_all(songlinks, url_pattern, "") 
+    }
+    else if(links){return(songlinks)}
+    else return(songKeys)
+}

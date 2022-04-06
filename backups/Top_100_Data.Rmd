@@ -1,0 +1,191 @@
+---
+title: "DenverCharts"
+author: "Zain Elsell"
+date: '2022-03-30'
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)#tidy
+library(spotifyr)#spotify web api wrapper class
+library(ggplot2)#ggplot for testing
+library(lubridate) #dates
+library(readr) #text file reading
+library(knitr) #live knit files
+library(reticulate) #python cells and interaction with R requires miniConda
+#install.packages("remotes") #
+#remotes::install_github("mvkorpel/pickURL")
+
+```
+
+
+First we began by generating the sequence of dates that we want to scrape and since the end of urls take the form of Year-Month-Day we'll use the same format. Then we can covert the dates to a class that python can actually read turning it into a list object.
+
+```{r}
+F_Scrape_day = "2022-03-31" #Final Scrape day
+I_Scrape_day = "2021-10-21" #Intial Scrape day
+#Generate our sequence of dates using lubridate
+dateSeq = seq.Date(from = as.Date(I_Scrape_day), to = as.Date(F_Scrape_day), by = 'weeks')
+#Convert to python list
+length(dateSeq)
+datesSeqAsPyL = r_to_py(dateSeq) 
+```
+
+The following cells automate the data acquisition process by going on the [spotify charts website](https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest) and then using some python code to copy the html table class into a text file named AutoData.txt. For testing we used the from March 25th located [here](https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/2022-03-31) . Keep in mind these are not just the songs that are trending in Denver they are the songs that are uniquely trending in just Denver show casing the local music taste instead of the national one.
+
+```{python}
+import pyautogui as pygui
+import datetime as dt
+import win32clipboard
+import random
+
+```
+
+This cell will only run on a windows machine since it's using win32clipboard package:
+
+```{python}
+def pasteToFile(filename = "Autodata.txt", curDate = "X"):
+  f=open(filename, "a", encoding="utf-8")
+  win32clipboard.OpenClipboard() 
+  data = win32clipboard.GetClipboardData()
+  cdata=  "\n\nSDateHere:" + str(curDate) + "\n\n"+ str(data) 
+  if(cdata != None):
+    print("got data!\n")  
+  f.write(cdata)
+  win32clipboard.CloseClipboard()
+  f.close()
+  
+
+def copyTable():
+  pygui.moveTo(161, 787)
+  pygui.click(button = 'right')
+  pygui.moveTo(161, 767)
+  pygui.PAUSE = random.uniform(0,1)
+  pygui.click(button = 'left')
+  pygui.moveTo(1282, 380, duration = 0.5)
+  pygui.click(button = 'right')
+  pygui.PAUSE = random.uniform(0,0.9)
+  pygui.moveTo(1282, 528, duration = 0.5)
+  pygui.moveTo(1382, 528, duration = 0.5)
+  pygui.moveTo(1582, 528, duration = 0.5)
+  pygui.click(button = 'left')
+  pygui.PAUSE = random.uniform(0,0.4)
+
+
+def goToPrevWeek(date):
+  pygui.press('F6')
+  pygui.press('delete')
+  randf = random.uniform(0,0.7)
+  pygui.typewrite("https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/" + date, interval = 0.1)
+  pygui.PAUSE = random.uniform(0,1)
+  pygui.press('enter')
+  
+
+def beginScrape():
+  dseq = [dateobj.strftime('%Y-%m-%d') for dateobj in r.datesSeqAsPyL]
+  dseq = list(reversed(dseq))
+  
+  for i in dseq:
+    pygui.hotkey('ctrl', 'r')
+    copyTable()
+    pasteToFile("AutoData.txt", i)
+    goToPrevWeek(i)
+    pygui.PAUSE = random.uniform(0,3)
+
+
+```
+
+Begin scrarping the charts website
+```{python}
+#beginScrape()
+```
+
+
+Here's where we can actually start to interact with the spotify Web API, to do this we are using the spotifyr wrapper class.
+
+```{r} 
+id ='71e950603dd64e1291d04fabafee04d9'
+secret = '5331da62c4644ee887ff07216c35b183'
+Sys.setenv(SPOTIFY_CLIENT_ID = id)
+Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
+access_token <- get_spotify_access_token() #
+```
+
+
+```{r}
+p_id = "zain_elsell"  # personal id
+# ----------------------------------------------------------------------------------------------
+# params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
+scrape_table = function(file_name, keys=1, links=0)
+{
+    
+    url_pattern = "https://open.spotify.com/track/"  # track link pattern
+    exKey = "26wuBc04catG1QQyYupr35"
+    
+    songlinks = c()  # blank vector to store just song links
+    sLinksIndex = str_locate_all(read_file(file_name), url_pattern) %>% data.frame()
+    for(i in sLinksIndex$start){
+      songlinks = c(songlinks, str_sub(read_file(file_name), start = i, end= (i+nchar(url_pattern)+nchar(exKey))-1))
+    }
+    if(keys){
+    songKeys = str_replace_all(songlinks, url_pattern , "")
+    songKeys = rle(songKeys)$values
+    }
+    else if(links){return(songlinks)}
+    else return(songKeys)
+}
+# ---------------------------------------------------------------------------------------------
+key_to_df <-function(x){
+    df <-data.frame()
+    names <- c()
+    artist_names <- c()
+    for (i in x){
+        df <-rbind(df, get_track_audio_features(i))} # binds all of the audio features together
+    
+    for (i in df$id){ # adds the name of the song and the artist to the df
+        name2 <- c(get_tracks(i)[["name"]])
+        names = c(names, name2)
+        temp <- get_tracks(i)[1]
+        tempdf <- data.frame(temp[[1]])
+        tempname <- tempdf[["name"]][1]
+        artist_names = c(artist_names, tempname)}
+    df <- df %>% mutate(song_name=(names), artist_name=artist_names) %>% 
+      relocate(artist_name) %>% 
+      relocate(song_name)# this just rearranging columns
+    df <- df %>% 
+      select(-c(mode, type, uri,track_href, analysis_url)) #removing useless columns
+    df <- cbind(df, rep(dateSeq, each=100))
+    return(df)
+}
+# ----------------------------------------------------------------------------------------------
+# For testing use local pulse march 28 so we have control for values to expect
+# raw_html_file_name = "Local_Pulse_March_28.txt"
+# songKeys = scrape_table(raw_html_file_name)
+# trackDf = key_to_df(songKeys)
+
+
+```
+
+
+This is where we actually call our function above to get the song keys from the raw Html then contact the API to get information from a song and finally, generate a data-frame:
+
+```{r} 
+raw_html_file_name = "AutoData.txt"
+songKeys = scrape_table(raw_html_file_name)
+songKeys
+trackDf = key_to_df(songKeys)
+head(trackDf)
+```
+
+
+Finally we export at all to a csv so we don't have to use these computationally heavy functions multiple times.
+```{r}
+path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_proj"
+trackdf %>% write.csv(path_to_csv, row.names = 0)
+```
+
+
+
+
