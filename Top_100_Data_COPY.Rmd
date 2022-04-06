@@ -38,27 +38,24 @@ for (i in x) {
 }
 
 names<- c()
+artist_names<- c()
 for (i in df$id){
   name2<-c(get_tracks(i)[["name"]])
   names = c(names,name2)
-  
-}
-
-artist_names<- c()
-for (i in df$id){
   temp <- get_tracks(i)[1]
   tempdf <- data.frame(temp[[1]])
   tempname <- tempdf[["name"]][1]
   artist_names = c(artist_names,tempname)
-
 }
-df <- df %>% mutate(song_name = unique(names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
+
+df <- df %>% mutate(song_name = (names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
 tracks = df
 
 tracks <- tracks %>% select(-c(mode,type,uri,	
 track_href,analysis_url))
 tracks
 return(tracks)
+}
 }
 ```
 
@@ -115,9 +112,16 @@ key_to_df(songKeys)
 
 get_artist("21mKp7DqtSNHhCAU2ugvUw")
 get_album("0Z78pMtq563O6ApUA2xum1")
+
+write.csv(trackDf,"C:\\Users\\avery\\OneDrive\\Documents\\GitHub\\spotify_data_proj\\test.csv")
 ```
 
 
+
+
+```{r}
+spotifyr::search_spotify("Pepas")
+```
 
 
 
