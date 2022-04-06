@@ -20,96 +20,15 @@ library(reticulate) #python cells and interaction with R requires miniConda
 
 ```
 
-
 First we began by generating the sequence of dates that we want to scrape and since the end of urls take the form of Year-Month-Day we'll use the same format. Then we can covert the dates to a class that python can actually read turning it into a list object.
 
 ```{r}
-<<<<<<< Updated upstream
-
-p_id = "zain_elsell"  # personal id
-
-# #This is where the control  data was taken from:
-# url_charts_local = "https://charts.spotify.com/charts/view/citypulsetrack-denver-weekly/latest"
-# url_charts_login_redirct = "https://accounts.spotify.com/en/login?continue=https%3A%2F%2Fcharts.spotify.com/login"
-
-# ---------------------------------------------------------------------------------------------
-key_to_df <-function(x){
-    df <-data.frame()
-    names <- c()
-    artist_names <- c()
-
-    for (i in x){
-        df <-rbind(df, get_track_audio_features(i))} # binds all of the audio features together
-    
-    for (i in df$id){ # adds the name of the song and the artist to the df
-        name2 <- c(get_tracks(i)[["name"]])
-        names = c(names, name2)
-        temp <- get_tracks(i)[1]
-        tempdf <- data.frame(temp[[1]])
-        tempname <- tempdf[["name"]][1]
-        artist_names = c(artist_names, tempname)}
-
-    df <- df %>% mutate(song_name=(names), artist_name=artist_names) %>% 
-      relocate(artist_name) %>% 
-      relocate(song_name)# this just rearranging columns
-
-    df <- df %>% 
-      select(-c(mode, type, uri,track_href, analysis_url)) #removing useless columns
-
-    return(df)
-}
-# ----------------------------------------------------------------------------------------------
-
-# params raw html table class you want to scrape .txt file name/ do you want just the song song keys? / do yo you want the full links to the tracks?
-scrape_table = function(file_name, keys=1, links=0, keysWdates=0)
-{
-    # vector of every charter in the raw html
-    htmlVectorRaw = read_file(file_name)
-    all_links = pickURL:: pick_urls(htmlVectorRaw) # picks out all occurrences of links in the raw html code
-    songlinks = c()  # blank vector to store just song links
-    url_pattern = "https://open.spotify.com/track/"  # track link pattern
-    datePattern = "SDate:"
-
-    for(i in 1: length(all_links)){  # get only song links in all_links
-        if(str_detect(all_links[i], url_pattern))
-        {
-            songlinks = c(songlinks, all_links[i])
-        }
-    }
-
-
-
-    if(keys){songKeys = str_replace_all(songlinks, url_pattern, "")}
-    else if(links){return(songlinks)}
-    else if(keysWdates){}
-    else return(songKeys)
-
-}
-# ----------------------------------------------------------------------------------------------
-
-# For testing use local pulse march 28 so we have control for values to expect
-raw_html_file_name = "Local_Pulse_March_28.txt"
-songKeys = scrape_table(raw_html_file_name)
-
-trackDf = key_to_df(songKeys)
-
-```
-
-
-
-```{r}
-F_Scrape_day = "2022-03-18"
-I_Scrape_day = "2021-01-01"
-openTag = '<table cellpadding="12" class="Table__TableElement-evwssh-0 eAsZoj ChartsTable__StyledTable-sc-1ye7294-5 iQeNyw"><colgroup><col width="48px"><col width="5%"><colwidth="64%">'
-closeTag = '</table>'
-dateSeq = seq.Date(from = as.Date(I_Scrape_day), to = as.Date(F_Scrape_day), by = 'weeks') # base 
-=======
+ 
 F_Scrape_day = "2022-03-31" #Final Scrape day
 I_Scrape_day = "2021-10-21" #Intial Scrape day
 #Generate our sequence of dates using lubridate
 dateSeq = seq.Date(from = as.Date(I_Scrape_day), to = as.Date(F_Scrape_day), by = 'weeks')
 #Convert to python list
->>>>>>> Stashed changes
 length(dateSeq)
 datesSeqAsPyL = r_to_py(dateSeq) 
 ```
@@ -181,10 +100,6 @@ def beginScrape():
 Begin scrarping the charts website
 ```{python}
 #beginScrape()
-```
-
-```{r}
-spotifyr::search_spotify("Pepas")
 ```
 
 Here's where we can actually start to interact with the spotify Web API, to do this we are using the spotifyr wrapper class.
