@@ -1,0 +1,1099 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20221.22.0324.2209                               -->
+<workbook original-version='18.1' source-build='2022.1.0 (20221.22.0324.2209)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <_.fcp.ObjectModelEncapsulateLegacy.true...ObjectModelEncapsulateLegacy />
+    <_.fcp.ObjectModelTableType.true...ObjectModelTableType />
+    <_.fcp.SchemaViewerObjectModel.true...SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <_.fcp.AnimationOnByDefault.false...style>
+    <_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule element='animation'>
+      <_.fcp.AnimationOnByDefault.false...format attr='animation-on' value='ao-on' />
+    </_.fcp.AnimationOnByDefault.false..._.fcp.MarkAnimation.true...style-rule>
+  </_.fcp.AnimationOnByDefault.false...style>
+  <datasources>
+    <datasource caption='Week1' inline='true' name='federated.1ca9rpc0ffcyow1g14jsf1uk89ot' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Week1' name='textscan.00w2drj1qzx1k21cf476w1hxmj1b'>
+            <connection class='textscan' directory='C:/Users/avery/OneDrive/Documents/GitHub/spotify_data_proj' filename='Week1.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='textscan.00w2drj1qzx1k21cf476w1hxmj1b' name='Week1.csv' table='[Week1#csv]' type='table'>
+          <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+            <column datatype='integer' name='index' ordinal='0' />
+            <column datatype='string' name='song_name' ordinal='1' />
+            <column datatype='string' name='artist_name' ordinal='2' />
+            <column datatype='real' name='danceability' ordinal='3' />
+            <column datatype='real' name='energy' ordinal='4' />
+            <column datatype='integer' name='key' ordinal='5' />
+            <column datatype='real' name='loudness' ordinal='6' />
+            <column datatype='real' name='speechiness' ordinal='7' />
+            <column datatype='real' name='acousticness' ordinal='8' />
+            <column datatype='real' name='instrumentalness' ordinal='9' />
+            <column datatype='real' name='liveness' ordinal='10' />
+            <column datatype='real' name='valence' ordinal='11' />
+            <column datatype='real' name='tempo' ordinal='12' />
+            <column datatype='string' name='id' ordinal='13' />
+            <column datatype='integer' name='duration_ms' ordinal='14' />
+            <column datatype='integer' name='time_signature' ordinal='15' />
+          </columns>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='textscan.00w2drj1qzx1k21cf476w1hxmj1b' name='Week1.csv' table='[Week1#csv]' type='table'>
+          <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+            <column datatype='integer' name='index' ordinal='0' />
+            <column datatype='string' name='song_name' ordinal='1' />
+            <column datatype='string' name='artist_name' ordinal='2' />
+            <column datatype='real' name='danceability' ordinal='3' />
+            <column datatype='real' name='energy' ordinal='4' />
+            <column datatype='integer' name='key' ordinal='5' />
+            <column datatype='real' name='loudness' ordinal='6' />
+            <column datatype='real' name='speechiness' ordinal='7' />
+            <column datatype='real' name='acousticness' ordinal='8' />
+            <column datatype='real' name='instrumentalness' ordinal='9' />
+            <column datatype='real' name='liveness' ordinal='10' />
+            <column datatype='real' name='valence' ordinal='11' />
+            <column datatype='real' name='tempo' ordinal='12' />
+            <column datatype='string' name='id' ordinal='13' />
+            <column datatype='integer' name='duration_ms' ordinal='14' />
+            <column datatype='integer' name='time_signature' ordinal='15' />
+          </columns>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;ibm-5348_P100-1997&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>index</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[index]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>index</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>song_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[song_name]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>song_name</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>artist_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[artist_name]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>artist_name</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>danceability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[danceability]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>danceability</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>energy</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[energy]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>energy</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>key</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[key]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>key</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>loudness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[loudness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>loudness</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>speechiness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[speechiness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>speechiness</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>acousticness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[acousticness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>acousticness</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>instrumentalness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[instrumentalness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>instrumentalness</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>liveness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[liveness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>liveness</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>valence</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[valence]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>valence</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>tempo</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[tempo]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>tempo</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>id</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[id]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>id</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>duration_ms</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[duration_ms]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>duration_ms</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>time_signature</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[time_signature]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>time_signature</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_89207060051C44A08419584A55BBEF87]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <_.fcp.ObjectModelTableType.true...column caption='Week1.csv' datatype='table' name='[__tableau_internal_object_id__].[Week1.csv_89207060051C44A08419584A55BBEF87]' role='measure' type='quantitative' />
+      <column datatype='real' name='[acousticness]' role='measure' type='quantitative' />
+      <column datatype='real' name='[danceability]' role='measure' type='quantitative' />
+      <column datatype='integer' name='[duration_ms]' role='measure' type='quantitative' />
+      <column datatype='real' name='[energy]' role='measure' type='quantitative' />
+      <column datatype='integer' name='[index]' role='measure' type='quantitative' />
+      <column datatype='real' name='[instrumentalness]' role='measure' type='quantitative' />
+      <column datatype='integer' name='[key]' role='measure' type='quantitative' />
+      <column datatype='real' name='[liveness]' role='measure' type='quantitative' />
+      <column datatype='real' name='[loudness]' role='measure' type='quantitative' />
+      <column datatype='real' name='[speechiness]' role='measure' type='quantitative' />
+      <column datatype='real' name='[tempo]' role='measure' type='quantitative' />
+      <column datatype='integer' name='[time_signature]' role='measure' type='quantitative' />
+      <column datatype='real' name='[valence]' role='measure' type='quantitative' />
+      <column-instance column='[__tableau_internal_object_id__].[Week1.csv_89207060051C44A08419584A55BBEF87]' derivation='Count' name='[__tableau_internal_object_id__].[cnt:Week1.csv_89207060051C44A08419584A55BBEF87:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[duration_ms]' derivation='Attribute' name='[attr:duration_ms:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[acousticness]' derivation='Avg' name='[avg:acousticness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[danceability]' derivation='Avg' name='[avg:danceability:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[duration_ms]' derivation='Avg' name='[avg:duration_ms:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[energy]' derivation='Avg' name='[avg:energy:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[duration_ms]' derivation='Avg' name='[diff:avg:duration_ms:qk]' pivot='key' type='quantitative'>
+        <table-calc diff-options='Relative' ordering-type='Rows' type='Difference'>
+          <address>
+            <value>-1</value>
+          </address>
+        </table-calc>
+      </column-instance>
+      <column-instance column='[acousticness]' derivation='Sum' name='[sum:acousticness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[danceability]' derivation='Sum' name='[sum:danceability:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[duration_ms]' derivation='Sum' name='[sum:duration_ms:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[energy]' derivation='Sum' name='[sum:energy:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[index]' derivation='Sum' name='[sum:index:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[instrumentalness]' derivation='Sum' name='[sum:instrumentalness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[key]' derivation='Sum' name='[sum:key:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[liveness]' derivation='Sum' name='[sum:liveness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[loudness]' derivation='Sum' name='[sum:loudness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[speechiness]' derivation='Sum' name='[sum:speechiness:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[tempo]' derivation='Sum' name='[sum:tempo:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[time_signature]' derivation='Sum' name='[sum:time_signature:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[valence]' derivation='Sum' name='[sum:valence:qk]' pivot='key' type='quantitative' />
+      <column-instance column='[energy]' derivation='Var' name='[var:energy:qk]' pivot='key' type='quantitative' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <style>
+        <style-rule element='mark'>
+          <encoding attr='color' field='[:Measure Names]' type='palette'>
+            <map to='#499894'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:liveness:qk]&quot;</bucket>
+            </map>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:energy:qk]&quot;</bucket>
+            </map>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:energy:qk]&quot;</bucket>
+            </map>
+            <map to='#4e79a7'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[var:energy:qk]&quot;</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[attr:duration_ms:qk]&quot;</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:duration_ms:qk]&quot;</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[diff:avg:duration_ms:qk]&quot;</bucket>
+            </map>
+            <map to='#59a14f'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:duration_ms:qk]&quot;</bucket>
+            </map>
+            <map to='#79706e'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:tempo:qk]&quot;</bucket>
+            </map>
+            <map to='#8cd17d'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:index:qk]&quot;</bucket>
+            </map>
+            <map to='#a0cbe8'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[__tableau_internal_object_id__].[cnt:Week1.csv_89207060051C44A08419584A55BBEF87:qk]&quot;</bucket>
+            </map>
+            <map to='#b6992d'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:instrumentalness:qk]&quot;</bucket>
+            </map>
+            <map to='#bab0ac'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:time_signature:qk]&quot;</bucket>
+            </map>
+            <map to='#d37295'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:valence:qk]&quot;</bucket>
+            </map>
+            <map to='#e15759'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:loudness:qk]&quot;</bucket>
+            </map>
+            <map to='#f1ce63'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:key:qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:danceability:qk]&quot;</bucket>
+            </map>
+            <map to='#f28e2b'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:danceability:qk]&quot;</bucket>
+            </map>
+            <map to='#ff9d9a'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:speechiness:qk]&quot;</bucket>
+            </map>
+            <map to='#ffbe7d'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:acousticness:qk]&quot;</bucket>
+            </map>
+            <map to='#ffbe7d'>
+              <bucket>&quot;[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:acousticness:qk]&quot;</bucket>
+            </map>
+          </encoding>
+        </style-rule>
+      </style>
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='Week1.csv' id='Week1.csv_89207060051C44A08419584A55BBEF87'>
+            <properties context=''>
+              <relation connection='textscan.00w2drj1qzx1k21cf476w1hxmj1b' name='Week1.csv' table='[Week1#csv]' type='table'>
+                <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+                  <column datatype='integer' name='index' ordinal='0' />
+                  <column datatype='string' name='song_name' ordinal='1' />
+                  <column datatype='string' name='artist_name' ordinal='2' />
+                  <column datatype='real' name='danceability' ordinal='3' />
+                  <column datatype='real' name='energy' ordinal='4' />
+                  <column datatype='integer' name='key' ordinal='5' />
+                  <column datatype='real' name='loudness' ordinal='6' />
+                  <column datatype='real' name='speechiness' ordinal='7' />
+                  <column datatype='real' name='acousticness' ordinal='8' />
+                  <column datatype='real' name='instrumentalness' ordinal='9' />
+                  <column datatype='real' name='liveness' ordinal='10' />
+                  <column datatype='real' name='valence' ordinal='11' />
+                  <column datatype='real' name='tempo' ordinal='12' />
+                  <column datatype='string' name='id' ordinal='13' />
+                  <column datatype='integer' name='duration_ms' ordinal='14' />
+                  <column datatype='integer' name='time_signature' ordinal='15' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+    <datasource caption='Week1 (2)' inline='true' name='federated.0tom8tr1de02tz17wan1k0b0tc2c' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Week1' name='textscan.1bbw9mk1biw33m13ln8ld09g0ydi'>
+            <connection class='textscan' directory='C:/Users/avery/OneDrive/Documents/GitHub/spotify_data_proj' filename='Week1.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <_.fcp.ObjectModelEncapsulateLegacy.false...relation connection='textscan.1bbw9mk1biw33m13ln8ld09g0ydi' name='Week1.csv' table='[Week1#csv]' type='table'>
+          <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+            <column datatype='integer' name='index' ordinal='0' />
+            <column datatype='string' name='song_name' ordinal='1' />
+            <column datatype='string' name='artist_name' ordinal='2' />
+            <column datatype='real' name='danceability' ordinal='3' />
+            <column datatype='real' name='energy' ordinal='4' />
+            <column datatype='integer' name='key' ordinal='5' />
+            <column datatype='real' name='loudness' ordinal='6' />
+            <column datatype='real' name='speechiness' ordinal='7' />
+            <column datatype='real' name='acousticness' ordinal='8' />
+            <column datatype='real' name='instrumentalness' ordinal='9' />
+            <column datatype='real' name='liveness' ordinal='10' />
+            <column datatype='real' name='valence' ordinal='11' />
+            <column datatype='real' name='tempo' ordinal='12' />
+            <column datatype='string' name='id' ordinal='13' />
+            <column datatype='integer' name='duration_ms' ordinal='14' />
+            <column datatype='integer' name='time_signature' ordinal='15' />
+          </columns>
+        </_.fcp.ObjectModelEncapsulateLegacy.false...relation>
+        <_.fcp.ObjectModelEncapsulateLegacy.true...relation connection='textscan.1bbw9mk1biw33m13ln8ld09g0ydi' name='Week1.csv' table='[Week1#csv]' type='table'>
+          <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+            <column datatype='integer' name='index' ordinal='0' />
+            <column datatype='string' name='song_name' ordinal='1' />
+            <column datatype='string' name='artist_name' ordinal='2' />
+            <column datatype='real' name='danceability' ordinal='3' />
+            <column datatype='real' name='energy' ordinal='4' />
+            <column datatype='integer' name='key' ordinal='5' />
+            <column datatype='real' name='loudness' ordinal='6' />
+            <column datatype='real' name='speechiness' ordinal='7' />
+            <column datatype='real' name='acousticness' ordinal='8' />
+            <column datatype='real' name='instrumentalness' ordinal='9' />
+            <column datatype='real' name='liveness' ordinal='10' />
+            <column datatype='real' name='valence' ordinal='11' />
+            <column datatype='real' name='tempo' ordinal='12' />
+            <column datatype='string' name='id' ordinal='13' />
+            <column datatype='integer' name='duration_ms' ordinal='14' />
+            <column datatype='integer' name='time_signature' ordinal='15' />
+          </columns>
+        </_.fcp.ObjectModelEncapsulateLegacy.true...relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;ibm-5348_P100-1997&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>index</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[index]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>index</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>song_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[song_name]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>song_name</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>artist_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[artist_name]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>artist_name</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>danceability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[danceability]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>danceability</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>energy</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[energy]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>energy</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>key</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[key]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>key</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>loudness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[loudness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>loudness</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>speechiness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[speechiness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>speechiness</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>acousticness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[acousticness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>acousticness</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>instrumentalness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[instrumentalness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>instrumentalness</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>liveness</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[liveness]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>liveness</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>valence</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[valence]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>valence</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>tempo</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[tempo]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>tempo</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>id</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[id]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>id</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>duration_ms</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[duration_ms]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>duration_ms</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>time_signature</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[time_signature]</local-name>
+            <parent-name>[Week1.csv]</parent-name>
+            <remote-alias>time_signature</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <_.fcp.ObjectModelEncapsulateLegacy.true...object-id>[Week1.csv_F91EA69661C349C4AB546093007B7A40]</_.fcp.ObjectModelEncapsulateLegacy.true...object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <_.fcp.ObjectModelTableType.true...column caption='Week1.csv' datatype='table' name='[__tableau_internal_object_id__].[Week1.csv_F91EA69661C349C4AB546093007B7A40]' role='measure' type='quantitative' />
+      <column caption='Acousticness' datatype='real' name='[acousticness]' role='measure' type='quantitative' />
+      <column caption='Artist Name' datatype='string' name='[artist_name]' role='dimension' type='nominal' />
+      <column caption='Danceability' datatype='real' name='[danceability]' role='measure' type='quantitative' />
+      <column caption='Duration Ms' datatype='integer' name='[duration_ms]' role='measure' type='quantitative' />
+      <column caption='Energy' datatype='real' name='[energy]' role='measure' type='quantitative' />
+      <column caption='Id' datatype='string' name='[id]' role='dimension' type='nominal' />
+      <column caption='Index' datatype='integer' name='[index]' role='measure' type='quantitative' />
+      <column caption='Instrumentalness' datatype='real' name='[instrumentalness]' role='measure' type='quantitative' />
+      <column caption='Key' datatype='integer' name='[key]' role='dimension' type='ordinal' />
+      <column caption='Liveness' datatype='real' name='[liveness]' role='measure' type='quantitative' />
+      <column caption='Loudness' datatype='real' name='[loudness]' role='measure' type='quantitative' />
+      <column caption='Song Name' datatype='string' name='[song_name]' role='dimension' type='nominal' />
+      <column caption='Speechiness' datatype='real' name='[speechiness]' role='measure' type='quantitative' />
+      <column caption='Tempo' datatype='real' name='[tempo]' role='measure' type='quantitative' />
+      <column caption='Time Signature' datatype='integer' name='[time_signature]' role='measure' type='quantitative' />
+      <column caption='Valence' datatype='real' name='[valence]' role='measure' type='quantitative' />
+      <layout _.fcp.SchemaViewerObjectModel.false...dim-percentage='0.5' _.fcp.SchemaViewerObjectModel.false...measure-percentage='0.4' dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+        <objects>
+          <object caption='Week1.csv' id='Week1.csv_F91EA69661C349C4AB546093007B7A40'>
+            <properties context=''>
+              <relation connection='textscan.1bbw9mk1biw33m13ln8ld09g0ydi' name='Week1.csv' table='[Week1#csv]' type='table'>
+                <columns character-set='windows-1252' header='yes' locale='en_US' separator=','>
+                  <column datatype='integer' name='index' ordinal='0' />
+                  <column datatype='string' name='song_name' ordinal='1' />
+                  <column datatype='string' name='artist_name' ordinal='2' />
+                  <column datatype='real' name='danceability' ordinal='3' />
+                  <column datatype='real' name='energy' ordinal='4' />
+                  <column datatype='integer' name='key' ordinal='5' />
+                  <column datatype='real' name='loudness' ordinal='6' />
+                  <column datatype='real' name='speechiness' ordinal='7' />
+                  <column datatype='real' name='acousticness' ordinal='8' />
+                  <column datatype='real' name='instrumentalness' ordinal='9' />
+                  <column datatype='real' name='liveness' ordinal='10' />
+                  <column datatype='real' name='valence' ordinal='11' />
+                  <column datatype='real' name='tempo' ordinal='12' />
+                  <column datatype='string' name='id' ordinal='13' />
+                  <column datatype='integer' name='duration_ms' ordinal='14' />
+                  <column datatype='integer' name='time_signature' ordinal='15' />
+                </columns>
+              </relation>
+            </properties>
+          </object>
+        </objects>
+      </_.fcp.ObjectModelEncapsulateLegacy.true...object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Sheet 1'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Week1' name='federated.1ca9rpc0ffcyow1g14jsf1uk89ot' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1ca9rpc0ffcyow1g14jsf1uk89ot'>
+            <_.fcp.ObjectModelTableType.true...column caption='Week1.csv' datatype='table' name='[__tableau_internal_object_id__].[Week1.csv_89207060051C44A08419584A55BBEF87]' role='measure' type='quantitative' />
+            <column-instance column='[__tableau_internal_object_id__].[Week1.csv_89207060051C44A08419584A55BBEF87]' derivation='Count' name='[__tableau_internal_object_id__].[cnt:Week1.csv_89207060051C44A08419584A55BBEF87:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' name='[acousticness]' role='measure' type='quantitative' />
+            <column-instance column='[acousticness]' derivation='Avg' name='[avg:acousticness:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[danceability]' derivation='Avg' name='[avg:danceability:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' name='[danceability]' role='measure' type='quantitative' />
+            <column datatype='real' name='[energy]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[index]' role='measure' type='quantitative' />
+            <column datatype='real' name='[instrumentalness]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[key]' role='measure' type='quantitative' />
+            <column datatype='real' name='[liveness]' role='measure' type='quantitative' />
+            <column datatype='real' name='[loudness]' role='measure' type='quantitative' />
+            <column-instance column='[song_name]' derivation='None' name='[none:song_name:nk]' pivot='key' type='nominal' />
+            <column datatype='string' name='[song_name]' role='dimension' type='nominal' />
+            <column datatype='real' name='[speechiness]' role='measure' type='quantitative' />
+            <column-instance column='[energy]' derivation='Sum' name='[sum:energy:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[index]' derivation='Sum' name='[sum:index:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[instrumentalness]' derivation='Sum' name='[sum:instrumentalness:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[key]' derivation='Sum' name='[sum:key:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[liveness]' derivation='Sum' name='[sum:liveness:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[loudness]' derivation='Sum' name='[sum:loudness:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[speechiness]' derivation='Sum' name='[sum:speechiness:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[tempo]' derivation='Sum' name='[sum:tempo:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[time_signature]' derivation='Sum' name='[sum:time_signature:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[valence]' derivation='Sum' name='[sum:valence:qk]' pivot='key' type='quantitative' />
+            <column datatype='real' name='[tempo]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[time_signature]' role='measure' type='quantitative' />
+            <column datatype='real' name='[valence]' role='measure' type='quantitative' />
+            <_.fcp.ObjectModelTableType.false...column caption='Week1.csv' datatype='integer' name='[__tableau_internal_object_id__].[Week1.csv_89207060051C44A08419584A55BBEF87]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='1' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[__tableau_internal_object_id__].[cnt:Week1.csv_89207060051C44A08419584A55BBEF87:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='2' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:acousticness:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='3' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:danceability:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='4' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:energy:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='5' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:index:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='6' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:instrumentalness:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='7' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:key:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='8' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:liveness:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='9' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:loudness:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='10' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:speechiness:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='11' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:tempo:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='12' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:time_signature:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+          <pane id='13' selection-relaxation-option='selection-relaxation-allow' y-axis-name='[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:valence:qk]'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+        </panes>
+        <rows>([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[__tableau_internal_object_id__].[cnt:Week1.csv_89207060051C44A08419584A55BBEF87:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:acousticness:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[avg:danceability:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:energy:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:index:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:instrumentalness:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:key:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:liveness:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:loudness:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:speechiness:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:tempo:qk] + ([federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:time_signature:qk] + [federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[sum:valence:qk]))))))))))))</rows>
+        <cols>[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[none:song_name:nk]</cols>
+      </table>
+      <simple-id uuid='{3FEED59A-AB8F-45B1-99A0-975DC6AE547C}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='75'>
+    <window class='worksheet' maximized='true' name='Sheet 1'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[:Measure Names]</field>
+            <field>[federated.1ca9rpc0ffcyow1g14jsf1uk89ot].[none:song_name:nk]</field>
+          </color-one-way>
+        </highlight>
+        <default-map-tool-selection tool='2' />
+      </viewpoint>
+      <simple-id uuid='{DE37D2EA-23CF-4FCE-B3AA-DB8C81F9746C}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='Sheet 1' width='192'>
+      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
+      gg==
+    </thumbnail>
+  </thumbnails>
+</workbook>

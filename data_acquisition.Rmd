@@ -180,6 +180,14 @@ path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_p
 res = write.csv(trackDf,path_to_csv)
 ```
 
+Quick function to graph the average values
+
+```{r}
+avg_grapher <- function(trackDf){
+  ggplot(aes)
+  
+}
+```
 
 
 
