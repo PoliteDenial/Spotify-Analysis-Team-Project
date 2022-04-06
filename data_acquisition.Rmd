@@ -176,7 +176,7 @@ head(trackDf)
 
 Finally we export at all to a csv so we don't have to use these computationally heavy functions multiple times.
 ```{r}
-path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_proj\\trackData.csv"
+path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_proj\\clean_data\\trackData.csv"
 res = write.csv(trackDf,path_to_csv)
 ```
 
