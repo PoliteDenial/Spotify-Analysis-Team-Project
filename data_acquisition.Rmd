@@ -189,5 +189,8 @@ avg_grapher <- function(trackDf){
 }
 ```
 
+```{r}
+Rserve::Rserve()
+```
 
 

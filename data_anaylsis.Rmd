@@ -30,23 +30,45 @@ Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
 ```
 
-
-
 ```{r}
-drake <- get_artist_audio_features("Drake")
+
+song <- search_spotify("Codeine Crazy")[[3]]
+song <- song[[2]][c("name","popularity")]
+
+song[song[,"popularity"] == max(song$popularity)]
 ```
 
 
 
-```{r}
 
-df_drake <- drake %>% select(c(track_name,album_name,key_mode,album_release_date,duration_ms))
 
-keys <- count(drake,key_mode,sort = TRUE)
-keys
-```
 
-```{r}
-print(drake)
-``
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
