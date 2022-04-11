@@ -1,0 +1,7 @@
+{
+  "r.rpath.mac": "/Library/Frameworks/R.framework/Versions/4.1/Resources/lib",
+  "r.alwaysUseActiveTerminal": true,
+  "r.bracketedPaste": true,
+  "r.helpPanel.cacheIndexFiles": "Global",
+  "r.rterm.linux": "/Users/zain/opt/anaconda3/bin/radian"
+}

@@ -12,7 +12,7 @@ library(tidyverse)#tidy
 library(spotifyr)#spotify web api wrapper class
 library(lubridate) #dates
 library(readr) #text file reading
-library(knitr) #live knit cells
+library(knitr) #live knit cells 
 library(reticulate) #python cells and interaction with R requires miniConda
 ```
 
