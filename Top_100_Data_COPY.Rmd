@@ -92,7 +92,6 @@ for(i in 1:length(all_links))
 
 songKeys = str_replace_all(songlinks, url_pattern, "")
 songKeys
-<<<<<<< Updated upstream:backups/Top_100_Data_COPY.Rmd
 ```
 
 
@@ -113,47 +112,6 @@ key_to_df(songKeys)
 
 
 ```{r}
-=======
-```
-
-```{r}
-df <- data.frame()
-
-for (i in songKeys) {
-  df <- rbind(df,get_track_audio_features(i))
-}
-
-names<- c()
-for (i in df$id){
-  name2<-c(get_tracks(i)[["name"]])
-  names = c(names,name2)
-  
-}
-
-artist_names<- c()
-for (i in df$id){
-  temp <- get_tracks(i)[1]
-  tempdf <- data.frame(temp[[1]])
-  tempname <- tempdf[["name"]][1]
-  artist_names = c(artist_names,tempname)
-  
-  
-}
-#artist_names
-df <- df %>% mutate(song_name = unique(names), artist_name = artist_names) %>% relocate(artist_name) %>% relocate(song_name)
-
-```
-
-```{r}
-tracks = df
-
-tracks <- tracks %>% select(-c(mode,type,uri,	
-track_href,analysis_url))
-tracks
-```
-
-```{r}
->>>>>>> Stashed changes:Top_100_Data.Rmd
 
 get_artist("21mKp7DqtSNHhCAU2ugvUw")
 get_album("0Z78pMtq563O6ApUA2xum1")
