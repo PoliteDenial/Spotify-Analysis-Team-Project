@@ -32,12 +32,13 @@ access_token <- get_spotify_access_token()
 
 ```{r}
 
-
 data <- read.csv("clean_data\\trackData.csv")
 
-v = data %>% group_by(song_name) %>% summarise(avg = mean(ranking))
+v = data %>% group_by(song_name,artist_name) %>% summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending) %>% arrange(avg_rank_per_week)
 View(v)
 
+songs_selected <- v %>% filter(avg_rank < 20,weeks_trending > 2)
+View(songs_selected)
 ```
 
 
