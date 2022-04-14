@@ -18,8 +18,8 @@ library(spotifyr)
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
+library(glmnet)
 ```
-
 
 
 ```{r}
@@ -30,16 +30,63 @@ Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
 ```
 
+
 ```{r}
 
 data <- read.csv("clean_data\\trackData.csv")
+cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
-v = data %>% group_by(song_name,artist_name) %>% summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending) %>% arrange(avg_rank_per_week)
-View(v)
 
-songs_selected <- v %>% filter(avg_rank < 20,weeks_trending > 2)
-View(songs_selected)
+training_data <- data %>% group_by_at(cols_to_keep) %>% summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending) %>% arrange(avg_rank_per_week) # training data
+
+training_data
 ```
+
+```{r}
+#songs_selected <- training_data %>% filter(avg_rank < 20,weeks_trending > 2)
+#Lasso vars
+y <- training_data$avg_rank
+
+x <- data.matrix(training_data[,c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")])
+
+cv_model <- cv.glmnet(x,y,alpha = 1)
+
+best_lambda <- cv_model$lambda.min
+
+best_lambda
+
+#----------------------------------------------------------------------------------------------
+# LASSO Training with random song
+plot(cv_model)
+
+
+best_model <- glmnet(x,y,alpha = 1, lambda = best_lambda)
+coef(best_model)
+
+new = spotifyr::search_spotify("Taps",type = "track")
+
+id = new["id"][[1]][1]
+
+track = get_track_audio_features(id)
+track = track[c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")]
+
+
+
+new = matrix(as_vector(track),nrow = 1,ncol = 9)
+predict(best_model, s = best_lambda, newx = new)
+#----------------------------------------------------------------------------------------------
+#use fitted best model to make predictions
+y_predicted <- predict(best_model, s = best_lambda, newx = x)
+
+
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predicted - y)^2)
+
+#find R-Squared
+rsq <- 1 - sse/sst
+rsq
+```
+
 
 
 
