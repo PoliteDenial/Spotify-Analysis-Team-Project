@@ -19,10 +19,10 @@ library(tidyverse)
 library(ggplot2)
 library(lubridate)
 library(glmnet)
+library(caret)
 ```
 
-
-```{r}
+ ```{r}
 id <- '29dd370f3d934a20999183b22e985a7b'
 secret <- "84fd28b593d84527bcafcfb0adab6106"
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
@@ -32,24 +32,33 @@ access_token <- get_spotify_access_token()
 
 
 ```{r}
+dpath = "clean_data//trackData.csv"
+data = read.csv(dpath) 
+cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
-data <- read.csv("clean_data\\trackData.csv")
-cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
+
+# data <- read.csv("clean_data//trackData.csv")
+# cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
+
+# #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
+
+s = sample(c(0,1), replace=1, prob = c(0.7,0.2) , size = nrow(data))
+train = data
+train$sample  = s
+test = subset(train, sample==0)
+train = subset(train, sample!=0)
 
 
-training_data <- data %>% group_by_at(cols_to_keep) %>% summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending) %>% arrange(avg_rank_per_week) # training data
-
-training_data
 ```
 
 ```{r}
 #songs_selected <- training_data %>% filter(avg_rank < 20,weeks_trending > 2)
 #Lasso vars
-y <- training_data$avg_rank
+y <- train$ranking
 
-x <- data.matrix(training_data[,c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")])
+x <- data.matrix(train[,c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")])
 
-cv_model <- cv.glmnet(x,y,alpha = 1)
+cv_model <- cv.glmnet(x,y,alpha = 0)
 
 best_lambda <- cv_model$lambda.min
 
@@ -60,11 +69,10 @@ best_lambda
 plot(cv_model)
 
 
-best_model <- glmnet(x,y,alpha = 1, lambda = best_lambda)
+best_model <- glmnet(x,y,alpha = 0, lambda = best_lambda)
 coef(best_model)
-
-new = spotifyr::search_spotify("Taps",type = "track")
-
+SongQ = "Live Well"
+new = spotifyr::search_spotify(SongQ,type = "track")
 id = new["id"][[1]][1]
 
 track = get_track_audio_features(id)
@@ -78,7 +86,6 @@ predict(best_model, s = best_lambda, newx = new)
 #use fitted best model to make predictions
 y_predicted <- predict(best_model, s = best_lambda, newx = x)
 
-
 sst <- sum((y - mean(y))^2)
 sse <- sum((y_predicted - y)^2)
 
@@ -86,17 +93,6 @@ sse <- sum((y_predicted - y)^2)
 rsq <- 1 - sse/sst
 rsq
 ```
-
-
-
-
-
-
-
-
-
-
-
 
 
 
