@@ -1,6 +1,5 @@
 ---
 title: "Untitled"
-author: "Avery"
 date: "3/16/2022"
 output:
   html_document: default
@@ -20,9 +19,10 @@ library(ggplot2)
 library(lubridate)
 library(glmnet)
 library(caret)
+library(reshape2)
 ```
 
- ```{r}
+```{r}
 id <- '29dd370f3d934a20999183b22e985a7b'
 secret <- "84fd28b593d84527bcafcfb0adab6106"
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
@@ -31,84 +31,156 @@ access_token <- get_spotify_access_token()
 ```
 
 
+
 ```{r}
-dpath = "clean_data//trackData.csv"
-data = read.csv(dpath) 
-cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
-
-
 # data <- read.csv("clean_data//trackData.csv")
 # cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
 # #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
 
-s = sample(c(0,1), replace=1, prob = c(0.7,0.2) , size = nrow(data))
-train = data
-train$sample  = s
-test = subset(train, sample==0)
-train = subset(train, sample!=0)
+dpath = "clean_data\\trackData.csv"
+data = read.csv(dpath) 
+cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
+
+```
+
+
+A corrlation heatmap of audio features, and rank in our dataframe help determine what features actually have a strong correlation with a "high" rank.  
+```{r}
+#------------------------------------------------------
+#select columns we care about
+heat_df = data[,c(4:13,15,16,18)]
+#
+cor_mat = round(cor(heat_df),2)
+
+getLow = function(corMatrix) #give the lower triangle of a corrlation matrix
+{
+  corMatrix[upper.tri(corMatrix)] = NA
+  return(corMatrix)
+}
+
+ltri = getLow(cor_mat)
+m_cor_mat_f = melt(ltri, na.rm = 1)
+
+#------------------------------------------------------
+corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
+geom_tile(color = "white") +
+scale_fill_gradient2(high = "#f51bc6", low = "#0400ff", mid = "#e7e7e7", 
+midpoint = 0, limit = c(-1,1), space = "Lab", name = "Corralation\nStrength") +
+theme_minimal() +
+coord_fixed() + 
+theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1))+
+labs(
+x = "Audio Features", 
+y=  "Audio Features", 
+title = "Spotify Audio Features And There Corralations In Denver Colorado"
+)
+
+corMap
+```
+
+From here we want to take a look at the features that when compared to rank column have the strongest  correlations both negative and postive depending on the way in which the value is formatted. So if we look at the far right column we can see that very clearly there are postive correlations primarily between rank and danceability along with rank and valence. We generally want to look for negative correlations since the lower a songs rank is the closer it is to the number one spot on the charts. That being said within our data set it looks to be the case that energy, loudness, instrumentalness, livelness and duration are correlated with a "high" rank or is more likely to be on the upper section of the charts.
+
+
+As disscussed above and shown by our correlation heatmap, the most relevant freatures to use to predict a song will be popular are energy, loudness, instrumentalness, livelness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
+
+Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. Additionally we also tried using ridge regression then elastic net but this gave less then perfect result as well.
+
+```{r}
+
+#selecting Features and making random traning/test partions of data 
+model_features = c(
+ "energy",
+ "loudness",
+ "instrumentalness",
+ "liveness",
+ "duration_ms",
+ "acousticness",
+ "valence" )
+
+train = data
+train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data))
+test = train %>% filter( sample %in% c(0))
+train = subset(train, sample!=0)
 
 ```
 
 ```{r}
-#songs_selected <- training_data %>% filter(avg_rank < 20,weeks_trending > 2)
+
 #Lasso vars
-y <- train$ranking
+y <- train$ranking # nolint
+x <- data.matrix(train[,model_features])
 
-x <- data.matrix(train[,c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")])
-
-cv_model <- cv.glmnet(x,y,alpha = 0)
-
+cv_model <- cv.glmnet(x,y,alpha = 0.8)
 best_lambda <- cv_model$lambda.min
+#best_lambda
+plot(cv_model)
+best_model <- glmnet(x,y,alpha = 0.8, lambda = best_lambda)
+coef(best_model)
 
-best_lambda
 
 #----------------------------------------------------------------------------------------------
-# LASSO Training with random song
-plot(cv_model)
+
+```
+```{r}
 
 
-best_model <- glmnet(x,y,alpha = 0, lambda = best_lambda)
-coef(best_model)
-SongQ = "Live Well"
-new = spotifyr::search_spotify(SongQ,type = "track")
-id = new["id"][[1]][1]
+toBinary = function(data, cut_off)
+{
+  binaryRep = sapply(data, function(rank){
+    ifelse(rank <=  cut_off, 1, 0)
+  })
 
-track = get_track_audio_features(id)
-track = track[c("danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")]
+  return(binaryRep)
+}
 
 
+test_features = as.matrix(test[,model_features])
 
-new = matrix(as_vector(track),nrow = 1,ncol = 9)
-predict(best_model, s = best_lambda, newx = new)
 #----------------------------------------------------------------------------------------------
 #use fitted best model to make predictions
-y_predicted <- predict(best_model, s = best_lambda, newx = x)
+y_predicted = predict(best_model, s = best_lambda, newx = test_features)
+y_test = test$rank 
 
-sst <- sum((y - mean(y))^2)
-sse <- sum((y_predicted - y)^2)
 
-#find R-Squared
-rsq <- 1 - sse/sst
-rsq
+g_cut_off = 50
+y_hat_binary = toBinary(y_predicted, g_cut_off)
+true_rank_binary = toBinary(y_test, g_cut_off)
+
+
+confusionMatrix(
+  data = as.factor(y_hat_binary), 
+  reference = as.factor(true_rank_binary)
+  )
+
+getEstimatedRank = function(song_query = "", mf = "", model, lambda)
+{
+  new = spotifyr::search_spotify(song_query,type = "track")
+  id = new["id"][[1]][1]
+  track = get_track_audio_features(id)
+  track = track[model_features]
+  new = matrix(as_vector(track),nrow = 1,ncol = 7)
+  q_prediction = predict(model,
+  s = lambda, 
+  newx = new)
+  return(q_prediction)
+}
+
+
+# sst <- sum((y - mean(y))^2)
+# sse <- sum((y_predicted - y)^2)
+# #find R-Squared
+# rsq <- 1 - sse/sst
+# rsq
 ```
 
 
 
+```{r}
 
+getEstimatedRank("Box Fan Sound", model_features, best_model, best_lambda)
 
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 
