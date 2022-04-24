@@ -20,6 +20,8 @@ library(lubridate)
 library(glmnet)
 library(caret)
 library(reshape2)
+library(randomForest)
+library(ModelMetrics)
 ```
 
 ```{r}
@@ -30,51 +32,113 @@ Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
 ```
 
-
-
 ```{r}
 # data <- read.csv("clean_data//trackData.csv")
-# cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
-
 # #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
 
-dpath = "clean_data\\trackData.csv"
+cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
+
+dpath = "clean_data/trackData.csv"
 data = read.csv(dpath) 
 cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
-
 ```
 
-
-A corrlation heatmap of audio features, and rank in our dataframe help determine what features actually have a strong correlation with a "high" rank.  
 ```{r}
-#------------------------------------------------------
-#select columns we care about
-heat_df = data[,c(4:13,15,16,18)]
-#
-cor_mat = round(cor(heat_df),2)
+#This cell contains primarily contains functions that we use throughout the anaylsis process:
 
-getLow = function(corMatrix) #give the lower triangle of a corrlation matrix
+
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#Searchs spotify for a song and given a model predict is value using that model
+#model_type
+# elastic net/ lasso/ridge =1
+# random forest/logistic/linear = 2
+# If it requires a lamda value then chose 1...
+
+getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lambda = 0)
+{
+  new = spotifyr::search_spotify(song_query,type = "track")
+  id = new["id"][[1]][1]
+  track = get_track_audio_features(id)
+  track = track[mf]
+  new_track = matrix(as_vector(track),nrow = 1, ncol = length(mf))
+    
+ 
+  switch(model_type,
+  "1"= 
+  
+  predict(modelObj,s = lambda, newx = new_track),
+  "2"=
+  predict(modelObj, newx = new_track)
+  )
+}
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#convert a set of values to 0,1  given a cutoff value ie 10 <= 50 therefore return 1
+toBinary = function(data, cut_off) 
+{
+  binaryRep = sapply(data, function(rank){
+    ifelse(rank <=  cut_off, 1, 0)
+  })
+  return(binaryRep)
+}
+#////////////////////////////////////////////////////////////////////////////////////////////////
+#Give the lower triangle of a corrlation matrix
+getLow = function(corMatrix) 
 {
   corMatrix[upper.tri(corMatrix)] = NA
   return(corMatrix)
 }
+#Calculate and print mse, rmse, normalized rmse, and r squared value to console 
+get_metrics = function(Actual, Predicted, model){
+  mse = mse(Actual,Predicted)
+  rmse = rmse(Actual,Predicted)
+  norm_rmse = rmse(Actual,Predicted) / (max(Actual)-min(Actual))
+  tss = sum((Actual - mean(Actual))^2)
+  regression_ss = sum((Predicted - mean(Predicted))^2)
+  r_sq = regression_ss/tss
+  # sst = sum((Actual - mean(Actual))^2)
+  # sse = sum((Predicted - Actual )^2)
+  # rsq = 1 - sse/sst
 
+  cat(
+  "\nGiven Model:",deparse(substitute(model)),"\n",
+  "\n////////////////////////////////////////////",
+  "\nMean squared error: ", mse,
+  "\nRoot mean sqaured error: ",rmse,
+  "\nNormailized root mean sqaured error: ",norm_rmse,
+  "\nR sqaured value of model: ",r_sq,
+  "\n////////////////////////////////////////////")
+}
+
+```
+
+A corrlation heatmap of audio features, and rank in our dataframe help determine what features actually have a strong correlation with a "high" rank.  
+
+```{r}
+#------------------------------------------------------
+#select columns we care about
+heat_df = data[,c(4:13,15,16,18)]
+#generate correlation matrix
+cor_mat = round(cor(heat_df),2)
+#get lower triangle of a correlation matrix
 ltri = getLow(cor_mat)
 m_cor_mat_f = melt(ltri, na.rm = 1)
 
 #------------------------------------------------------
+#plotting the correlation matrix
 corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
-geom_tile(color = "white") +
-scale_fill_gradient2(high = "#f51bc6", low = "#0400ff", mid = "#e7e7e7", 
-midpoint = 0, limit = c(-1,1), space = "Lab", name = "Corralation\nStrength") +
-theme_minimal() +
-coord_fixed() + 
-theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1))+
-labs(
-x = "Audio Features", 
-y=  "Audio Features", 
-title = "Spotify Audio Features And There Corralations In Denver Colorado"
+  geom_tile(color = "white") +
+  scale_fill_gradient2(high = "#f51bc6", low = "#0400ff", mid = "#e7e7e7", 
+  midpoint = 0, limit = c(-1,1), space = "Lab", name = "Corralation\nStrength") +
+  theme_minimal() +
+  coord_fixed() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1))+
+  labs(
+  x = "Audio Features", 
+  y=  "Audio Features", 
+  title = "Spotify Audio Features And There Corralations In Denver Colorado"
 )
 
 corMap
@@ -85,7 +149,9 @@ From here we want to take a look at the features that when compared to rank colu
 
 As disscussed above and shown by our correlation heatmap, the most relevant freatures to use to predict a song will be popular are energy, loudness, instrumentalness, livelness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
 
-Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. Additionally we also tried using ridge regression then elastic net but this gave less then perfect result as well.
+Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. Additionally we also tried using ridge regression then elastic net but this also gave us less then perfect results. 
+
+The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremly low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
 
 ```{r}
 
@@ -99,88 +165,95 @@ model_features = c(
  "acousticness",
  "valence" )
 
-train = data
-train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data))
-test = train %>% filter( sample %in% c(0))
-train = subset(train, sample!=0)
+set.seed(300)
+train = data #
+train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
+test = train %>% filter( sample %in% c(0)) 
+test = test[order(test$ranking),]
+train = subset(train, sample!=0) 
+true_rank = test$rank
 
 ```
 
 ```{r}
-
 #Lasso vars
 y <- train$ranking # nolint
 x <- data.matrix(train[,model_features])
 
-cv_model <- cv.glmnet(x,y,alpha = 0.8)
+cv_model <- cv.glmnet(x,y,alpha = 0.5)
 best_lambda <- cv_model$lambda.min
 #best_lambda
-plot(cv_model)
-best_model <- glmnet(x,y,alpha = 0.8, lambda = best_lambda)
-coef(best_model)
+#plot(cv_model)
+elastic_model <- glmnet(x,y,alpha = 0.5, lambda = best_lambda)
+coef(elastic_model)
 
-
-#----------------------------------------------------------------------------------------------
-
+#--------------------------------------------------------------------------------------------
 ```
-```{r}
-
-
-toBinary = function(data, cut_off)
-{
-  binaryRep = sapply(data, function(rank){
-    ifelse(rank <=  cut_off, 1, 0)
-  })
-
-  return(binaryRep)
-}
-
-
+```{r, warn =-1}
 test_features = as.matrix(test[,model_features])
-
-#----------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------
 #use fitted best model to make predictions
-y_predicted = predict(best_model, s = best_lambda, newx = test_features)
+y_predicted = predict(elastic_model, s = best_lambda, newx = test_features)
 y_test = test$rank 
 
-
 g_cut_off = 50
-y_hat_binary = toBinary(y_predicted, g_cut_off)
+
+
+y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
-
-
-confusionMatrix(
-  data = as.factor(y_hat_binary), 
-  reference = as.factor(true_rank_binary)
-  )
-
-getEstimatedRank = function(song_query = "", mf = "", model, lambda)
-{
-  new = spotifyr::search_spotify(song_query,type = "track")
-  id = new["id"][[1]][1]
-  track = get_track_audio_features(id)
-  track = track[model_features]
-  new = matrix(as_vector(track),nrow = 1,ncol = 7)
-  q_prediction = predict(model,
-  s = lambda, 
-  newx = new)
-  return(q_prediction)
-}
-
-
-# sst <- sum((y - mean(y))^2)
-# sse <- sum((y_predicted - y)^2)
-# #find R-Squared
-# rsq <- 1 - sse/sst
-# rsq
+caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
+get_metrics(test$ranking, y_predicted, elastic_model)
+#elasticEval = ggplot(aes(y_predicted ))
 ```
-
-
 
 ```{r}
 
-getEstimatedRank("Box Fan Sound", model_features, best_model, best_lambda)
+index = c(1:(length(true_rank)))
+e_df = data.frame(y_predicted, index)
+e_p = ggplot(e_df) + 
+geom_point(aes(y=y_predicted, x=index, colour = "Predicted Rank")) +  
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
+e_p
+```
+The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the elastic net regression model.
 
+```{r}
+getEstimatedRank("Love Letter", model_features,elastic_model , 1 , best_lambda)
 ```
 
+```{r}
+random_forest_model = randomForest(
+  #Below you can chose two formulas one with the same features as the elastic net model and one with all the features in the data set.
+  #formula = ranking~energy+liveness+valence+loudness+duration_ms+instrumentalness+acousticness,
+  formula = ranking~. ,
+  data = train,
+  mtry = 1000,
+  type = "regression")
+print(random_forest_model)
+print(importance(random_forest_model,type = 2)) 
 
+#testing our model 
+y_pred_rf = predict(random_forest_model, test)
+y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
+
+caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
+get_metrics(y_pred_rf, test$ranking, random_forest_model)
+
+
+
+```
+```{r}
+
+#val = round(append(y_pred_rf,true_rank, index))
+#category = rep(c("pred", "actual"), each = length(true_rank)
+rf_df = data.frame(y_pred_rf, index)
+rf_p = ggplot(rf_df) + 
+geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
+
+rf_p
+```
+```{r}
+#still needs work
+getEstimatedRank("Taps", model_features , random_forest_model , 2)
+```
