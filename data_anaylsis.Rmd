@@ -35,9 +35,6 @@ access_token <- get_spotify_access_token()
 ```{r}
 # data <- read.csv("clean_data//trackData.csv")
 # #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
-
-cols_to_keep <- c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
-
 dpath = "clean_data/trackData.csv"
 data = read.csv(dpath) 
 cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
@@ -53,7 +50,7 @@ cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","s
 #Searchs spotify for a song and given a model predict is value using that model
 #model_type
 # elastic net/ lasso/ridge =1
-# random forest/logistic/linear = 2
+# random forest = 2
 # If it requires a lamda value then chose 1...
 
 getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lambda = 0)
@@ -64,10 +61,8 @@ getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lam
   track = track[mf]
   new_track = matrix(as_vector(track),nrow = 1, ncol = length(mf))
     
- 
   switch(model_type,
   "1"= 
-  
   predict(modelObj,s = lambda, newx = new_track),
   "2"=
   predict(modelObj, newx = new_track)
@@ -91,24 +86,27 @@ getLow = function(corMatrix)
   return(corMatrix)
 }
 #Calculate and print mse, rmse, normalized rmse, and r squared value to console 
-get_metrics = function(Actual, Predicted, model){
+get_metrics = function(Actual, Predicted, model, rf = 0){
   mse = mse(Actual,Predicted)
   rmse = rmse(Actual,Predicted)
   norm_rmse = rmse(Actual,Predicted) / (max(Actual)-min(Actual))
   tss = sum((Actual - mean(Actual))^2)
-  regression_ss = sum((Predicted - mean(Predicted))^2)
-  r_sq = regression_ss/tss
+  rss = sum((Predicted-Actual)^2) #sum((Predicted - mean(Predicted))^2)
+  if(rf==0){
+    r_sq = 1-(rss/tss)
+  }
+  else {r_sq =mse/var(Actual)}
+  #adj_r_sq = ((1-r_sq)*(nrow(train)-2)/(length(mf)-nrow(train)-2))*1
   # sst = sum((Actual - mean(Actual))^2)
   # sse = sum((Predicted - Actual )^2)
   # rsq = 1 - sse/sst
-
   cat(
   "\nGiven Model:",deparse(substitute(model)),"\n",
   "\n////////////////////////////////////////////",
   "\nMean squared error: ", mse,
   "\nRoot mean sqaured error: ",rmse,
   "\nNormailized root mean sqaured error: ",norm_rmse,
-  "\nR sqaured value of model: ",r_sq,
+  "\nR^2 value of model: ",r_sq,
   "\n////////////////////////////////////////////")
 }
 
@@ -149,7 +147,7 @@ From here we want to take a look at the features that when compared to rank colu
 
 As disscussed above and shown by our correlation heatmap, the most relevant freatures to use to predict a song will be popular are energy, loudness, instrumentalness, livelness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
 
-Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. Additionally we also tried using ridge regression then elastic net but this also gave us less then perfect results. 
+Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. We also tried using ridge regression then elastic net but this also gave us less then perfect results. 
 
 The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremly low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
 
@@ -180,11 +178,11 @@ true_rank = test$rank
 y <- train$ranking # nolint
 x <- data.matrix(train[,model_features])
 
-cv_model <- cv.glmnet(x,y,alpha = 0.5)
+cv_model <- cv.glmnet(x,y,alpha = 0)
 best_lambda <- cv_model$lambda.min
 #best_lambda
 #plot(cv_model)
-elastic_model <- glmnet(x,y,alpha = 0.5, lambda = best_lambda)
+elastic_model <- glmnet(x,y,alpha = 0, lambda = best_lambda)
 coef(elastic_model)
 
 #--------------------------------------------------------------------------------------------
@@ -198,16 +196,13 @@ y_test = test$rank
 
 g_cut_off = 50
 
-
 y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
 caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
-get_metrics(test$ranking, y_predicted, elastic_model)
-#elasticEval = ggplot(aes(y_predicted ))
+get_metrics(test$ranking, y_predicted, elastic_model, model_features)
 ```
 
 ```{r}
-
 index = c(1:(length(true_rank)))
 e_df = data.frame(y_predicted, index)
 e_p = ggplot(e_df) + 
@@ -215,11 +210,14 @@ geom_point(aes(y=y_predicted, x=index, colour = "Predicted Rank")) +
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
 e_p
 ```
+
 The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the elastic net regression model.
 
 ```{r}
-getEstimatedRank("Love Letter", model_features,elastic_model , 1 , best_lambda)
+getEstimatedRank("Love Letter", model_features , elastic_model , 1 , best_lambda)
 ```
+
+
 
 ```{r}
 random_forest_model = randomForest(
@@ -227,33 +225,35 @@ random_forest_model = randomForest(
   #formula = ranking~energy+liveness+valence+loudness+duration_ms+instrumentalness+acousticness,
   formula = ranking~. ,
   data = train,
-  mtry = 1000,
-  type = "regression")
-print(random_forest_model)
-print(importance(random_forest_model,type = 2)) 
+  mtree = 50000,
+  mtry = 5,
+  type = "regression"
+)
 
-#testing our model 
 y_pred_rf = predict(random_forest_model, test)
 y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
-
 caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
-get_metrics(y_pred_rf, test$ranking, random_forest_model)
+get_metrics(test$ranking,y_pred_rf, random_forest_model, 1)
 
 
 
 ```
+
 ```{r}
 
-#val = round(append(y_pred_rf,true_rank, index))
-#category = rep(c("pred", "actual"), each = length(true_rank)
 rf_df = data.frame(y_pred_rf, index)
 rf_p = ggplot(rf_df) + 
 geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
-geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
 
 rf_p
+
 ```
+
+
+
+
 ```{r}
 #still needs work
-getEstimatedRank("Taps", model_features , random_forest_model , 2)
+  
 ```
