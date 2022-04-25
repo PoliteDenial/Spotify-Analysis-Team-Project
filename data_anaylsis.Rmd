@@ -2,8 +2,8 @@
 title: "Untitled"
 date: "3/16/2022"
 output:
-  html_document: default
-  pdf_document: default
+html_document: default
+pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -65,7 +65,7 @@ getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lam
   "1"= 
   predict(modelObj,s = lambda, newx = new_track),
   "2"=
-  predict(modelObj, newx = new_track)
+  predict(modelObj, newx = new_track, type = "response")
   )
 }
 #////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +217,7 @@ The function below allows you to search for a song in the spotify catalog and us
 getEstimatedRank("Love Letter", model_features , elastic_model , 1 , best_lambda)
 ```
 
-
+Random forest regression:
 
 ```{r}
 random_forest_model = randomForest(
@@ -226,7 +226,7 @@ random_forest_model = randomForest(
   formula = ranking~. ,
   data = train,
   mtree = 50000,
-  mtry = 5,
+  mtry = 8,
   type = "regression"
 )
 
@@ -247,13 +247,12 @@ geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
 
 rf_p
-
 ```
-
-
 
 
 ```{r}
 #still needs work
-  
+  getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
 ```
+
+Logistical Regression 
