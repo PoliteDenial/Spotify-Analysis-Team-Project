@@ -252,7 +252,31 @@ rf_p
 
 ```{r}
 #still needs work
-  getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
+  # getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
 ```
 
 Logistical Regression 
+
+
+```{r}
+# View(train)
+
+train <- train %>% mutate(trend_or_not = ifelse(ranking < 50, 1, 0))
+# train
+log_reg_model <- glm(
+  trend_or_not ~ ., 
+  data = train, 
+  family = "binomial"
+)
+
+
+pred <- predict(log_reg_model, test)
+pred_binary = toBinary(pred, 0.5)
+
+```
+
+```{r}
+
+log_reg_confusion = caret::confusionMatrix(as.factor(pred_binary), as.factor(true_rank_binary))
+log_reg_confusion
+```
