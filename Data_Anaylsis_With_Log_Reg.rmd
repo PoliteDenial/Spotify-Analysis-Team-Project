@@ -22,7 +22,6 @@ library(caret)
 library(reshape2)
 library(randomForest)
 library(ModelMetrics)
-library(ggdark)
 ```
 
 ```{r}
@@ -36,40 +35,19 @@ access_token <- get_spotify_access_token()
 ```{r}
 # data <- read.csv("clean_data//trackData.csv")
 # #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
-
-
 dpath = "clean_data/trackData.csv"
-data = read.csv(dpath)
+data = read.csv(dpath) 
 cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
-
-
-
-avg = data %>% 
-group_by(song_name)  %>%  
-summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
-mutate(rankingX = s_freq / weeks_trending)
-data = merge(avg, data, by="song_name")
-data = select(data, -c(week, ranking, id,X,s_freq))
-data=distinct(data)
-
-
-set.seed(100)
-
-
 ```
 
 ```{r}
 #This cell contains primarily contains functions that we use throughout the anaylsis process:
-
-
 #////////////////////////////////////////////////////////////////////////////////////////////////
-
 #Searchs spotify for a song and given a model predict is value using that model
 #model_type
 # elastic net/ lasso/ridge =1
 # random forest = 2
 # If it requires a lamda value then chose 1...
-
 getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lambda = 0)
 {
   new = spotifyr::search_spotify(song_query,type = "track")
@@ -90,7 +68,7 @@ getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lam
 toBinary = function(data, cut_off) 
 {
   binaryRep = sapply(data, function(rank){
-    ifelse(rank < cut_off, 1, 0)
+    ifelse(rank <=  cut_off, 1, 0)
   })
   return(binaryRep)
 }
@@ -102,73 +80,57 @@ getLow = function(corMatrix)
   return(corMatrix)
 }
 #Calculate and print mse, rmse, normalized rmse, and r squared value to console 
-get_metrics = function(Actual, Predicted, model, mf, rf = 0){
+get_metrics = function(Actual, Predicted, model, rf = 0){
   mse = mse(Actual,Predicted)
   rmse = rmse(Actual,Predicted)
-  alt_rmse= sqrt(sum((Predicted+Actual)^2)/length(Actual))
   norm_rmse = rmse(Actual,Predicted) / (max(Actual)-min(Actual))
   tss = sum((Actual - mean(Actual))^2)
   rss = sum((Predicted-Actual)^2) #sum((Predicted - mean(Predicted))^2)
-  if(rf==0)
-  {
+  if(rf==0){
     r_sq = 1-(rss/tss)
   }
-  else 
-  {
-    r_sq =mse/var(Actual)
-  }
-  top = (1-r_sq)*(length(Actual)-1)
-  bottom = (length(Actual)-length(mf)-1)
-  adj_r_sq = 1-(top/bottom)
+  else {r_sq =mse/var(Actual)}
+  #adj_r_sq = ((1-r_sq)*(nrow(train)-2)/(length(mf)-nrow(train)-2))*1
   # sst = sum((Actual - mean(Actual))^2)
   # sse = sum((Predicted - Actual )^2)
   # rsq = 1 - sse/sst
-  
-  cat("\nGiven Model:",deparse(substitute(model)),"\n",
+  cat(
+  "\nGiven Model:",deparse(substitute(model)),"\n",
   "\n////////////////////////////////////////////",
   "\nMean squared error: ", mse,
   "\nRoot mean sqaured error: ",rmse,
   "\nNormailized root mean sqaured error: ",norm_rmse,
   "\nR^2 value of model: ",r_sq,
-  "\nAdjusted R^2 value of model: ",adj_r_sq)
-  cat(
   "\n////////////////////////////////////////////")
 }
-
 ```
 
 A corrlation heatmap of audio features, and rank in our dataframe help determine what features actually have a strong correlation with a "high" rank.  
 
 ```{r}
 #------------------------------------------------------
-
-
 #select columns we care about
-heat_df = select_if(data, is.numeric)
+heat_df = data[,c(4:13,15,16,18)]
 #generate correlation matrix
 cor_mat = round(cor(heat_df),2)
 #get lower triangle of a correlation matrix
 ltri = getLow(cor_mat)
 m_cor_mat_f = melt(ltri, na.rm = 1)
-
 #------------------------------------------------------
 #plotting the correlation matrix
 corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
   geom_tile(color = "white") +
   scale_fill_gradient2(high = "#f51bc6", low = "#0400ff", mid = "#e7e7e7", 
   midpoint = 0, limit = c(-1,1), space = "Lab", name = "Corralation\nStrength") +
+  theme_minimal() +
   coord_fixed() + 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1))+
   labs(
   x = "Audio Features", 
   y=  "Audio Features", 
   title = "Spotify Audio Features And There Corralations In Denver Colorado"
-) 
-
-corMap + dark_theme_gray()
-
-
-corrplot::corrplot(cor_mat,method="number", type = "upper")
+)
+corMap
 ```
 
 From here we want to take a look at the features that when compared to rank column have the strongest  correlations both negative and postive depending on the way in which the value is formatted. So if we look at the far right column we can see that very clearly there are postive correlations primarily between rank and danceability along with rank and valence. We generally want to look for negative correlations since the lower a songs rank is the closer it is to the number one spot on the charts. That being said within our data set it looks to be the case that energy, loudness, instrumentalness, livelness and duration are correlated with a "high" rank or is more likely to be on the upper section of the charts.
@@ -181,8 +143,6 @@ Now that brings us to the task of deciding on what kind machine learning model w
 The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremly low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
 
 ```{r}
-
-
 #selecting Features and making random traning/test partions of data 
 model_features = c(
  "energy",
@@ -191,37 +151,26 @@ model_features = c(
  "liveness",
  "duration_ms",
  "acousticness",
- "valence",
- "key",
- "time_signature",
- "danceability",
- "tempo"
-  )
-
-set.seed(1010)
-train = data
+ "valence" )
+set.seed(300)
+train = data #
 train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
-test = train %>% filter( sample %in% c(0)) #partion data
-test = test[order(test$rankingX),] #clean test for viewing
-train = subset(train, sample!=0)  #partition train set
-true_rank = test$rankingX
-
-
-
+test = train %>% filter( sample %in% c(0)) 
+test = test[order(test$ranking),]
+train = subset(train, sample!=0) 
+true_rank = test$rank
 ```
 
 ```{r}
 #Lasso vars
-y <- train$rankingX # nolint
+y <- train$ranking # nolint
 x <- data.matrix(train[,model_features])
-
-cv_model <- cv.glmnet(x,y,alpha = 0.2)
+cv_model <- cv.glmnet(x,y,alpha = 0)
 best_lambda <- cv_model$lambda.min
 #best_lambda
 #plot(cv_model)
-elastic_model <- glmnet(x,y,alpha = 0.2, lambda = best_lambda)
+elastic_model <- glmnet(x,y,alpha = 0, lambda = best_lambda)
 coef(elastic_model)
-
 #--------------------------------------------------------------------------------------------
 ```
 ```{r, warn =-1}
@@ -229,14 +178,12 @@ test_features = as.matrix(test[,model_features])
 #--------------------------------------------------------------------------------------------
 #use fitted best model to make predictions
 y_predicted = predict(elastic_model, s = best_lambda, newx = test_features)
-y_test = test$rankingX
-
-g_cut_off = 70
-
+y_test = test$rank 
+g_cut_off = 50
 y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
 caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
-get_metrics(test$rankingX, y_predicted, elastic_model, model_features)
+get_metrics(test$ranking, y_predicted, elastic_model, model_features)
 ```
 
 ```{r}
@@ -244,9 +191,8 @@ index = c(1:(length(true_rank)))
 e_df = data.frame(y_predicted, index)
 e_p = ggplot(e_df) + 
 geom_point(aes(y=y_predicted, x=index, colour = "Predicted Rank")) +  
-geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-labs(x= "Song Index", y= "Ranking", title = "Elastic Model Performance") 
-e_p +dark_theme_gray()
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
+e_p
 ```
 
 The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the elastic net regression model.
@@ -261,45 +207,30 @@ Random forest regression:
 random_forest_model = randomForest(
   #Below you can chose two formulas one with the same features as the elastic net model and one with all the features in the data set.
   #formula = ranking~energy+liveness+valence+loudness+duration_ms+instrumentalness+acousticness,
-  formula = rankingX~. ,
+  formula = ranking~. ,
   data = train,
   mtree = 50000,
   mtry = 8,
   type = "regression"
 )
-
 y_pred_rf = predict(random_forest_model, test)
 y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
 caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
-get_metrics(test$rankingX,y_pred_rf, random_forest_model,model_features,1)
-
-
-
+get_metrics(test$ranking,y_pred_rf, random_forest_model, 1)
 ```
 
 ```{r}
-
 rf_df = data.frame(y_pred_rf, index)
 rf_p = ggplot(rf_df) + 
 geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
-geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-labs(x= "Song Index", y= "Ranking", title = "Random Forest Model Performance") + 
-dark_theme_gray()
-
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank"))
 rf_p
 ```
 
 
 ```{r}
 #still needs work
-<<<<<<< Updated upstream
   # getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
-=======
-  getEstimatedRank("Love Letter", model_features , random_forest_model, 1)
-
-
- 
->>>>>>> Stashed changes
 ```
 
 Logistical Regression 
@@ -307,7 +238,6 @@ Logistical Regression
 
 ```{r}
 # View(train)
-
 train <- train %>% mutate(trend_or_not = ifelse(ranking < 50, 1, 0))
 # train
 log_reg_model <- glm(
@@ -315,15 +245,11 @@ log_reg_model <- glm(
   data = train, 
   family = "binomial"
 )
-
-
 pred <- predict(log_reg_model, test)
 pred_binary = toBinary(pred, 0.5)
-
 ```
 
 ```{r}
-
 log_reg_confusion = caret::confusionMatrix(as.factor(pred_binary), as.factor(true_rank_binary))
 log_reg_confusion
 ```
