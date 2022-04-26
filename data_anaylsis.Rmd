@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Spotify Data_Anaylsis"
 date: "3/16/2022"
 output:
 html_document: default
@@ -26,11 +26,11 @@ library(ggdark)
 ```
 
 ```{r}
-id <- '29dd370f3d934a20999183b22e985a7b'
-secret <- "84fd28b593d84527bcafcfb0adab6106"
+id ='71e950603dd64e1291d04fabafee04d9'
+secret = '5331da62c4644ee887ff07216c35b183'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
-access_token <- get_spotify_access_token()
+access_token <- get_spotify_access_token() #
 ```
 
 ```{r}
@@ -40,10 +40,10 @@ access_token <- get_spotify_access_token()
 
 dpath = "clean_data/trackData.csv"
 data = read.csv(dpath)
-cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
+#cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
 
 
-
+#computing avg_rank_ per wek
 avg = data %>% 
 group_by(song_name)  %>%  
 summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
@@ -53,8 +53,8 @@ data = select(data, -c(week, ranking, id,X,s_freq))
 data=distinct(data)
 
 
-set.seed(100)
-
+head(data)
+set.seed(1010)
 
 ```
 
@@ -103,9 +103,13 @@ getLow = function(corMatrix)
 }
 #Calculate and print mse, rmse, normalized rmse, and r squared value to console 
 get_metrics = function(Actual, Predicted, model, mf, rf = 0){
-  mse = mse(Actual,Predicted)
-  rmse = rmse(Actual,Predicted)
-  alt_rmse= sqrt(sum((Predicted+Actual)^2)/length(Actual))
+  
+  vA= sum((Actual-mean(Actual))^2)/length(Actual)
+  vP = var(Predicted)
+  #mse = mse(Actual, Predicted)
+  mse = mean((Actual - Predicted)^2)
+  #rmse = rmse(Actual,Predicted)
+  rmse= sqrt(mean((Actual - Predicted)^2))
   norm_rmse = rmse(Actual,Predicted) / (max(Actual)-min(Actual))
   tss = sum((Actual - mean(Actual))^2)
   rss = sum((Predicted-Actual)^2) #sum((Predicted - mean(Predicted))^2)
@@ -123,9 +127,11 @@ get_metrics = function(Actual, Predicted, model, mf, rf = 0){
   # sst = sum((Actual - mean(Actual))^2)
   # sse = sum((Predicted - Actual )^2)
   # rsq = 1 - sse/sst
-  
+ 
   cat("\nGiven Model:",deparse(substitute(model)),"\n",
   "\n////////////////////////////////////////////",
+  "\nVariance Actual: ", vA,
+  "\nVariance Predicted: ", vP,
   "\nMean squared error: ", mse,
   "\nRoot mean sqaured error: ",rmse,
   "\nNormailized root mean sqaured error: ",norm_rmse,
@@ -153,7 +159,8 @@ m_cor_mat_f = melt(ltri, na.rm = 1)
 
 #------------------------------------------------------
 #plotting the correlation matrix
-corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
+corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) + 
+  dark_theme_gray() +
   geom_tile(color = "white") +
   scale_fill_gradient2(high = "#f51bc6", low = "#0400ff", mid = "#e7e7e7", 
   midpoint = 0, limit = c(-1,1), space = "Lab", name = "Corralation\nStrength") +
@@ -163,12 +170,10 @@ corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
   x = "Audio Features", 
   y=  "Audio Features", 
   title = "Spotify Audio Features And There Corralations In Denver Colorado"
-) 
-
-corMap + dark_theme_gray()
+)
 
 
-corrplot::corrplot(cor_mat,method="number", type = "upper")
+corMap
 ```
 
 From here we want to take a look at the features that when compared to rank column have the strongest  correlations both negative and postive depending on the way in which the value is formatted. So if we look at the far right column we can see that very clearly there are postive correlations primarily between rank and danceability along with rank and valence. We generally want to look for negative correlations since the lower a songs rank is the closer it is to the number one spot on the charts. That being said within our data set it looks to be the case that energy, loudness, instrumentalness, livelness and duration are correlated with a "high" rank or is more likely to be on the upper section of the charts.
@@ -196,17 +201,15 @@ model_features = c(
  "time_signature",
  "danceability",
  "tempo"
-  )
+)
 
-set.seed(1010)
 train = data
+
 train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
 test = train %>% filter( sample %in% c(0)) #partion data
 test = test[order(test$rankingX),] #clean test for viewing
 train = subset(train, sample!=0)  #partition train set
 true_rank = test$rankingX
-
-
 
 ```
 
@@ -231,11 +234,11 @@ test_features = as.matrix(test[,model_features])
 y_predicted = predict(elastic_model, s = best_lambda, newx = test_features)
 y_test = test$rankingX
 
-g_cut_off = 70
+g_cut_off = 50
 
 y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
-caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
+#caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
 get_metrics(test$rankingX, y_predicted, elastic_model, model_features)
 ```
 
@@ -257,6 +260,9 @@ getEstimatedRank("Love Letter", model_features , elastic_model , 1 , best_lambda
 
 Random forest regression:
 
+
+As You can see our random forest model performs quite a bit better then the elastic net reggression.
+
 ```{r}
 random_forest_model = randomForest(
   #Below you can chose two formulas one with the same features as the elastic net model and one with all the features in the data set.
@@ -264,15 +270,14 @@ random_forest_model = randomForest(
   formula = rankingX~. ,
   data = train,
   mtree = 50000,
-  mtry = 8,
+  mtry = 4,
   type = "regression"
 )
 
 y_pred_rf = predict(random_forest_model, test)
 y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
-caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
+#caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
 get_metrics(test$rankingX,y_pred_rf, random_forest_model,model_features,1)
-
 
 
 ```
@@ -292,38 +297,5 @@ rf_p
 
 ```{r}
 #still needs work
-<<<<<<< Updated upstream
-  # getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
-=======
-  getEstimatedRank("Love Letter", model_features , random_forest_model, 1)
-
-
- 
->>>>>>> Stashed changes
-```
-
-Logistical Regression 
-
-
-```{r}
-# View(train)
-
-train <- train %>% mutate(trend_or_not = ifelse(ranking < 50, 1, 0))
-# train
-log_reg_model <- glm(
-  trend_or_not ~ ., 
-  data = train, 
-  family = "binomial"
-)
-
-
-pred <- predict(log_reg_model, test)
-pred_binary = toBinary(pred, 0.5)
-
-```
-
-```{r}
-
-log_reg_confusion = caret::confusionMatrix(as.factor(pred_binary), as.factor(true_rank_binary))
-log_reg_confusion
+  #getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
 ```
