@@ -6,7 +6,7 @@
   - What metrics can be used to measure the likelihood of a song “trending”? 
   - Typically what songs trend in a particular region? 
   - How can we predict the kind of songs that will be popular in the future
-  - Can machine learning and models and regression models be applied to accurately predict that song will trend in a region?
+  - Can machine learning models and regression models be applied to accurately predict a songs chart ranking in a region?
 
 ## Presenation Slides:
 ![](./ppt_pres/pres_slow.gif)
