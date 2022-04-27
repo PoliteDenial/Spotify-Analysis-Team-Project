@@ -1,7 +1,11 @@
 ---
+<<<<<<< Updated upstream
 title: "Spotify Data_Anaylsis"
+=======
+title: "Spotify Data Anaylsis"
+>>>>>>> Stashed changes
 date: "3/16/2022"
-output:
+output: "html_document"
 html_document: default
 pdf_document: default
 ---
@@ -25,6 +29,9 @@ library(ModelMetrics)
 library(ggdark)
 ```
 
+
+
+Spotify API access tpe
 ```{r}
 id ='71e950603dd64e1291d04fabafee04d9'
 secret = '5331da62c4644ee887ff07216c35b183'
@@ -34,15 +41,27 @@ access_token <- get_spotify_access_token() #
 ```
 
 ```{r}
-# data <- read.csv("clean_data//trackData.csv")
-# #training_data <- data #%>% group_by_at(cols_to_keep)  #summarise(avg_rank = mean(ranking), weeks_trending = n()) %>% mutate(avg_rank_per_week = avg_rank/weeks_trending)# training data
-
-
+set.seed(2022)
 dpath = "clean_data/trackData.csv"
 data = read.csv(dpath)
+<<<<<<< Updated upstream
 #cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
+=======
 
+#Are we using pure ranking or ranking avg rank week? True if rank per week
+rank_xor = 0
+>>>>>>> Stashed changes
 
+if(rank_xor==1){
+    avg = data %>% 
+    group_by(song_name)  %>%  
+    summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
+    mutate(ranking = s_freq / weeks_trending)
+    data = merge(avg, data, by="song_name")
+    data = select(data, -c(week, ranking, id,X,s_freq))
+    data=distinct(data)
+
+<<<<<<< Updated upstream
 #computing avg_rank_ per wek
 avg = data %>% 
 group_by(song_name)  %>%  
@@ -55,6 +74,11 @@ data=distinct(data)
 
 head(data)
 set.seed(1010)
+=======
+}
+
+
+>>>>>>> Stashed changes
 
 ```
 
@@ -119,7 +143,7 @@ get_metrics = function(Actual, Predicted, model, mf, rf = 0){
   }
   else 
   {
-    r_sq =mse/var(Actual)
+    r_sq =sqrt(mse/var(Actual))
   }
   top = (1-r_sq)*(length(Actual)-1)
   bottom = (length(Actual)-length(mf)-1)
@@ -135,11 +159,12 @@ get_metrics = function(Actual, Predicted, model, mf, rf = 0){
   "\nMean squared error: ", mse,
   "\nRoot mean sqaured error: ",rmse,
   "\nNormailized root mean sqaured error: ",norm_rmse,
-  "\nR^2 value of model: ",r_sq,
-  "\nAdjusted R^2 value of model: ",adj_r_sq)
+  "\nR^2/Psuedo-R^2 value of model: ",r_sq)
+  #"\nAdjusted R^2 value of model: ",adj_r_sq)
   cat(
   "\n////////////////////////////////////////////")
 }
+
 
 ```
 
@@ -207,15 +232,15 @@ train = data
 
 train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
 test = train %>% filter( sample %in% c(0)) #partion data
-test = test[order(test$rankingX),] #clean test for viewing
+test = test[order(test$ranking),] #clean test for viewing
 train = subset(train, sample!=0)  #partition train set
-true_rank = test$rankingX
+true_rank = test$ranking
 
 ```
 
-```{r}
+```{r,warn = -1}
 #Lasso vars
-y <- train$rankingX # nolint
+y <- train$ranking # nolint
 x <- data.matrix(train[,model_features])
 
 cv_model <- cv.glmnet(x,y,alpha = 0.2)
@@ -226,29 +251,39 @@ elastic_model <- glmnet(x,y,alpha = 0.2, lambda = best_lambda)
 coef(elastic_model)
 
 #--------------------------------------------------------------------------------------------
-```
-```{r, warn =-1}
+
+
 test_features = as.matrix(test[,model_features])
 #--------------------------------------------------------------------------------------------
 #use fitted best model to make predictions
 y_predicted = predict(elastic_model, s = best_lambda, newx = test_features)
-y_test = test$rankingX
+y_test = test$ranking
 
 g_cut_off = 50
 
+<<<<<<< Updated upstream
 y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
 #caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
 get_metrics(test$rankingX, y_predicted, elastic_model, model_features)
 ```
+=======
+#y_hat_binary =toBinary(y_predicted, g_cut_off)
+#true_rank_binary = toBinary(y_test, g_cut_off)
+#caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
+>>>>>>> Stashed changes
 
-```{r}
+get_metrics(test$ranking, y_predicted, elastic_model, model_features)
+
+
+```
+```{r, warn =-1}
 index = c(1:(length(true_rank)))
 e_df = data.frame(y_predicted, index)
 e_p = ggplot(e_df) + 
 geom_point(aes(y=y_predicted, x=index, colour = "Predicted Rank")) +  
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-labs(x= "Song Index", y= "Ranking", title = "Elastic Model Performance") 
+labs(x= "Song Index", y= "ranking", title = "Elastic Model Performance") 
 e_p +dark_theme_gray()
 ```
 
@@ -256,6 +291,7 @@ The function below allows you to search for a song in the spotify catalog and us
 
 ```{r}
 getEstimatedRank("Love Letter", model_features , elastic_model , 1 , best_lambda)
+
 ```
 
 Random forest regression:
@@ -264,22 +300,33 @@ Random forest regression:
 As You can see our random forest model performs quite a bit better then the elastic net reggression.
 
 ```{r}
+test_n_rank =   select(test, -c(ranking))
+
 random_forest_model = randomForest(
-  #Below you can chose two formulas one with the same features as the elastic net model and one with all the features in the data set.
-  #formula = ranking~energy+liveness+valence+loudness+duration_ms+instrumentalness+acousticness,
-  formula = rankingX~. ,
+  formula = ranking~. ,
   data = train,
+<<<<<<< Updated upstream
   mtree = 50000,
   mtry = 4,
+=======
+  mtree = 10000,
+  mtry = 10,
+>>>>>>> Stashed changes
   type = "regression"
 )
-
-y_pred_rf = predict(random_forest_model, test)
+y_pred_rf = predict(random_forest_model, test_n_rank)
 y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
 #caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
+<<<<<<< Updated upstream
 get_metrics(test$rankingX,y_pred_rf, random_forest_model,model_features,1)
 
 
+=======
+get_metrics(test$ranking,y_pred_rf, random_forest_model,model_features,1)
+
+#summary(random_forest_model)
+
+>>>>>>> Stashed changes
 ```
 
 ```{r}
@@ -288,7 +335,7 @@ rf_df = data.frame(y_pred_rf, index)
 rf_p = ggplot(rf_df) + 
 geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-labs(x= "Song Index", y= "Ranking", title = "Random Forest Model Performance") + 
+labs(x= "Song Index", y= "ranking", title = "Random Forest Model Performance") + 
 dark_theme_gray()
 
 rf_p
@@ -297,5 +344,31 @@ rf_p
 
 ```{r}
 #still needs work
+<<<<<<< Updated upstream
   #getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
 ```
+=======
+  # getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
+```
+
+Extremely poor perfromign linear Regression Model
+```{r}
+# #index = c(1:(length(test_n_rank)))
+# train = select_if(train, is.numeric) 
+# linear_model = glm(formula = ranking ~., data = train)
+# l_pred = predict(linear_model,test)
+
+# get_metrics(true_rank,l_pred, linear_model ,model_features)
+
+# l_df = data.frame(l_pred, index)
+# l_p = ggplot(l_df) + 
+# geom_point(aes(y=l_pred, x=index, colour = "Predicted Rank")) +  
+# geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
+# labs(x= "Song Index", y= "Ranking", title = "Linear Model Performance") + 
+# dark_theme_gray()
+
+# l_p
+
+```
+
+>>>>>>> Stashed changes
