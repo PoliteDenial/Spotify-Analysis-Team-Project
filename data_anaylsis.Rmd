@@ -274,14 +274,12 @@ model_features = c(
 train = data
 
 #////////////////////////////////////////////////////////////////////////////////////////////////
-
 train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
 test = train %>% filter( sample %in% c(0)) #partion data
 test = test[order(test$ranking),] #clean test for viewing
 train = subset(train, sample!=0)  #partition train set
 true_rank = test$ranking
 #////////////////////////////////////////////////////////////////////////////////////////////////
-
 ```
 
 ```{r,warn = -1}
@@ -379,7 +377,7 @@ As You can see our random forest model performs quite a bit better then the elas
 
 ```{r}
 
-#Plot elastic regression true_rank vs avg rank
+#Plot rf true_rank vs avg rank
 rf_df = data.frame(y_pred_rf, index)
 
 #
@@ -390,8 +388,8 @@ labs(x= "Song Index", y= "ranking", title = "Random Forest Model Performance") +
 dark_theme_gray()
 plot(random_forest_model)
 rf_p
-
-tree_func(random_forest_model, ) tree_plot
+#Plot rf tree 1/10
+tree_func(random_forest_model, 1)
 
 ```
 
