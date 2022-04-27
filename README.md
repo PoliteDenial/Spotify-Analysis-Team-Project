@@ -1,5 +1,15 @@
-# spotify_data_proj
-A data analysis project in R and a bit of python using the Spotify API.
-Will a song trend in Denver, Colorado?
+# A Data Science Project
 
+- The overall goal of this analysis is to determine statistically significant correlations between a particular song metrics or “Audio Features” and the probability that a certain mood of the song will have an increase in the number of plays over time. 
+
+## The project will atttempt to answer the following:
+  - What metrics can be used to measure the likelihood of a song “trending”? 
+  - Typically what songs trend in a particular region? 
+  - How can we predict the kind of songs that will be popular in the future
+  - Can machine learning and models and regression models be applied to accurately predict that song will trend in a region?
+
+## Presenation Slides:
 ![](./ppt_pres/pres_slow.gif)
+
+
+- Please note that under the **/ppt_pres/** folder the slides can be downloaded in 3 formats, with the PDF being the highest quality.
