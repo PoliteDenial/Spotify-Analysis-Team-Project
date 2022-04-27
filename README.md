@@ -1,4 +1,4 @@
-# A Data Science Project
+# Spotify Data Science
 
 - The overall goal of this analysis is to determine statistically significant correlations between a particular song metrics or “Audio Features” and the probability that a certain mood of the song will have an increase in the number of plays over time. 
 
