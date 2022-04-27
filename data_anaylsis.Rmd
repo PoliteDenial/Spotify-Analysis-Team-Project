@@ -1,9 +1,5 @@
 ---
-<<<<<<< Updated upstream
-title: "Spotify Data_Anaylsis"
-=======
 title: "Spotify Data Anaylsis"
->>>>>>> Stashed changes
 date: "3/16/2022"
 output: "html_document"
 html_document: default
@@ -17,41 +13,95 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, warning=FALSE}
 library(dplyr)
-library(spotifyr)
 library(tidyverse)
 library(ggplot2)
 library(lubridate)
-library(glmnet)
-library(caret)
-library(reshape2)
 library(randomForest)
-library(ModelMetrics)
-library(ggdark)
+library(igraph)
+library(spotifyr) #spotify wrapper class
+library(glmnet)#A bunch of kinds of regression models (Use elastic net)
+library(caret)#optimizing random forest and a bunch of other ml tools
+library(reshape2)#cleaning a data frame
+library(ModelMetrics)#for use when computing and comparing by hand model metrics
+library(ggdark)#dark ggplot theme
 ```
 
 
 
-Spotify API access tpe
+Spotify API access token wrapper class for get rank function
 ```{r}
 id ='71e950603dd64e1291d04fabafee04d9'
-secret = '5331da62c4644ee887ff07216c35b183'
+secret = '4a8f958cd10448e7aba2aaed03280140'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
-access_token <- get_spotify_access_token() #
+access_token <- get_spotify_access_token() 
 ```
 
+
+Tree graphing function from [here](https://www.r-bloggers.com/2017/03/plotting-trees-from-random-forest-models-with-ggraph/) a
 ```{r}
-set.seed(2022)
-dpath = "clean_data/trackData.csv"
-data = read.csv(dpath)
-<<<<<<< Updated upstream
-#cols_to_keep = c("song_name","artist_name","danceability","energy","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo")
-=======
+library(ggraph)
+library(igraph)
+tree_func <- function(final_model, 
+                      tree_num) {
+  
+  # get tree by index
+  tree <- randomForest::getTree(final_model, 
+                                k = tree_num, 
+                                labelVar = TRUE) %>%
+    tibble::rownames_to_column() %>%
+    # make leaf split points to NA, so the 0s won't get plotted
+    mutate(`split point` = ifelse(is.na(prediction), `split point`, NA))
+  
+  # prepare data frame for graph
+  graph_frame <- data.frame(from = rep(tree$rowname, 2),
+                            to = c(tree$`left daughter`, tree$`right daughter`))
+  
+  # convert to graph and delete the last node that we don't want to plot
+  graph <- graph_from_data_frame(graph_frame) %>%
+    delete_vertices("0")
+  
+  # set node labels
+  V(graph)$node_label <- gsub("_", " ", as.character(tree$`split var`))
+  V(graph)$leaf_label <- as.character(tree$prediction)
+  V(graph)$split <- as.character(round(tree$`split point`, digits = 2))
+  
+  # plot
+  plot <- ggraph(graph, 'dendrogram') + 
+    theme_bw() +
+    geom_edge_link() +
+    geom_node_point() +
+    geom_node_text(aes(label = node_label), na.rm = TRUE, repel = TRUE) +
+    geom_node_label(aes(label = split), vjust = 2.5, na.rm = TRUE, fill = "white") +
+    geom_node_label(aes(label = leaf_label, fill = leaf_label), na.rm = TRUE, 
+                    repel = TRUE, colour = "white", fontface = "bold", show.legend = FALSE) +
+    theme(panel.grid.minor = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.background = element_blank(),
+          plot.background = element_rect(fill = "white"),
+          panel.border = element_blank(),
+          axis.line = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          plot.title = element_text(size = 18))
+  
+  print(plot)
+}
+```
+```{r}
+set.seed(2022) #Controlled random
+dpath = "clean_data/trackData.csv"#CSV path
+data = read.csv(dpath)#Import data from CSV in the same directory
 
-#Are we using pure ranking or ranking avg rank week? True if rank per week
+#////////////////////////////////////////////////////////////////////////////////////////////
+#Are we using pure ranking or ranking avg rank week? 
+#1 if avg rank 0 if just rank
 rank_xor = 0
->>>>>>> Stashed changes
 
+#Wa
 if(rank_xor==1){
     avg = data %>% 
     group_by(song_name)  %>%  
@@ -61,24 +111,9 @@ if(rank_xor==1){
     data = select(data, -c(week, ranking, id,X,s_freq))
     data=distinct(data)
 
-<<<<<<< Updated upstream
-#computing avg_rank_ per wek
-avg = data %>% 
-group_by(song_name)  %>%  
-summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
-mutate(rankingX = s_freq / weeks_trending)
-data = merge(avg, data, by="song_name")
-data = select(data, -c(week, ranking, id,X,s_freq))
-data=distinct(data)
-
-
-head(data)
-set.seed(1010)
-=======
 }
 
 
->>>>>>> Stashed changes
 
 ```
 
@@ -89,26 +124,31 @@ set.seed(1010)
 #////////////////////////////////////////////////////////////////////////////////////////////////
 
 #Searchs spotify for a song and given a model predict is value using that model
-#model_type
+#model_type defines mo
 # elastic net/ lasso/ridge =1
 # random forest = 2
 # If it requires a lamda value then chose 1...
 
-getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type, lambda = 0)
+getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type = 0, lambda = 0)
 {
   new = spotifyr::search_spotify(song_query,type = "track")
   id = new["id"][[1]][1]
   track = get_track_audio_features(id)
   track = track[mf]
+  view(track)
   new_track = matrix(as_vector(track),nrow = 1, ncol = length(mf))
-    
-  switch(model_type,
-  "1"= 
-  predict(modelObj,s = lambda, newx = new_track),
-  "2"=
-  predict(modelObj, newx = new_track, type = "response")
-  )
+  
+  if(model_type == 1){
+    predict(modelObj,s = lambda, newx = new_track)
+  }else if(model_type == 2){
+    l = as.vector(predict(modelObj, newx = new_track))
+    return(mean(tail(l, n=20)))
+  }else{
+    cat("\nInvalid model type!","\nTry 1 or 2")
+  }
+  
 }
+
 #////////////////////////////////////////////////////////////////////////////////////////////////
 #convert a set of values to 0,1  given a cutoff value ie 10 <= 50 therefore return 1
 toBinary = function(data, cut_off) 
@@ -128,7 +168,7 @@ getLow = function(corMatrix)
 #Calculate and print mse, rmse, normalized rmse, and r squared value to console 
 get_metrics = function(Actual, Predicted, model, mf, rf = 0){
   
-  vA= sum((Actual-mean(Actual))^2)/length(Actual)
+  vA= sum((Actual-mean(Actual))^2)/length(Actual) 
   vP = var(Predicted)
   #mse = mse(Actual, Predicted)
   mse = mean((Actual - Predicted)^2)
@@ -171,8 +211,7 @@ get_metrics = function(Actual, Predicted, model, mf, rf = 0){
 A corrlation heatmap of audio features, and rank in our dataframe help determine what features actually have a strong correlation with a "high" rank.  
 
 ```{r}
-#------------------------------------------------------
-
+#////////////////////////////////////////////////////////////////////////////////////////////////
 
 #select columns we care about
 heat_df = select_if(data, is.numeric)
@@ -182,7 +221,7 @@ cor_mat = round(cor(heat_df),2)
 ltri = getLow(cor_mat)
 m_cor_mat_f = melt(ltri, na.rm = 1)
 
-#------------------------------------------------------
+#////////////////////////////////////////////////////////////////////////////////////////////////
 #plotting the correlation matrix
 corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) + 
   dark_theme_gray() +
@@ -197,7 +236,6 @@ corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
   title = "Spotify Audio Features And There Corralations In Denver Colorado"
 )
 
-
 corMap
 ```
 
@@ -206,14 +244,16 @@ From here we want to take a look at the features that when compared to rank colu
 
 As disscussed above and shown by our correlation heatmap, the most relevant freatures to use to predict a song will be popular are energy, loudness, instrumentalness, livelness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
 
-Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. We also tried using ridge regression then elastic net but this also gave us less then perfect results. 
+Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. We also tried using ridge regression then elastic net but this also gave us less then perfect results.
+
+
 
 The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremly low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
 
 ```{r}
 
 
-#selecting Features and making random traning/test partions of data 
+#selecting Features 
 model_features = c(
  "energy",
  "loudness",
@@ -228,13 +268,19 @@ model_features = c(
  "tempo"
 )
 
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#Creating random traning/test partions of our data set with a 70/30 split
 train = data
+
+#////////////////////////////////////////////////////////////////////////////////////////////////
 
 train$sample  = sample(c(1,0), replace=1, prob = c(0.7,0.2) , size = nrow(data)) # add sample column
 test = train %>% filter( sample %in% c(0)) #partion data
 test = test[order(test$ranking),] #clean test for viewing
 train = subset(train, sample!=0)  #partition train set
 true_rank = test$ranking
+#////////////////////////////////////////////////////////////////////////////////////////////////
 
 ```
 
@@ -243,115 +289,124 @@ true_rank = test$ranking
 y <- train$ranking # nolint
 x <- data.matrix(train[,model_features])
 
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#Define model
 cv_model <- cv.glmnet(x,y,alpha = 0.2)
 best_lambda <- cv_model$lambda.min
-#best_lambda
-#plot(cv_model)
+
+#print coeff
+best_lambda
+#check model curve
+plot(cv_model)
+
+#////////////////////////////////////////////////////////////////////////////////////////////////
 elastic_model <- glmnet(x,y,alpha = 0.2, lambda = best_lambda)
 coef(elastic_model)
 
-#--------------------------------------------------------------------------------------------
-
-
+#////////////////////////////////////////////////////////////////////////////////////////////////
 test_features = as.matrix(test[,model_features])
-#--------------------------------------------------------------------------------------------
-#use fitted best model to make predictions
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#make our predctions
 y_predicted = predict(elastic_model, s = best_lambda, newx = test_features)
-y_test = test$ranking
+g_cut_off = 50 #cut off point for binary representations
 
-g_cut_off = 50
-
-<<<<<<< Updated upstream
+#How well do we perfrom at detecting the top 1:X tracks...
 y_hat_binary =toBinary(y_predicted, g_cut_off)
 true_rank_binary = toBinary(y_test, g_cut_off)
-#caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
-get_metrics(test$rankingX, y_predicted, elastic_model, model_features)
+caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary)) 
+
+#////////////////////////////////////////////////////////////////////////////////////////////////
+
+#Compute metrics of elastic_model
+get_metrics(true_rank, y_predicted, elastic_model, model_features) 
 ```
-=======
-#y_hat_binary =toBinary(y_predicted, g_cut_off)
-#true_rank_binary = toBinary(y_test, g_cut_off)
-#caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary))
->>>>>>> Stashed changes
-
-get_metrics(test$ranking, y_predicted, elastic_model, model_features)
 
 
-```
 ```{r, warn =-1}
-index = c(1:(length(true_rank)))
+
+#generate list of song index in datat frame
+index = c(1:(length(true_rank))) 
+#Create dataframe with predictions and index
 e_df = data.frame(y_predicted, index)
+
+#////////////////////////////////////////////////////////////////////////////////////////////////
+#Plot  regression true_rank vs predicted rank
 e_p = ggplot(e_df) + 
 geom_point(aes(y=y_predicted, x=index, colour = "Predicted Rank")) +  
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-labs(x= "Song Index", y= "ranking", title = "Elastic Model Performance") 
-e_p +dark_theme_gray()
+labs(x= "Song Index", y= "ranking", title = "Elastic Model Performance") +
+dark_theme_gray()
+e_p 
 ```
 
 The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the elastic net regression model.
 
 ```{r}
-getEstimatedRank("Love Letter", model_features , elastic_model , 1 , best_lambda)
-
+getEstimatedRank("Good Leo Trix", model_features , elastic_model , 1 , best_lambda)
 ```
 
-Random forest regression:
 
 
-As You can see our random forest model performs quite a bit better then the elastic net reggression.
+Using random forest for our regression model we get significantly better performance with a RMSE of 22.9 after running 1e5 iterations of the tree.
 
 ```{r}
+#////////////////////////////////////////////////////////////////////////////////////////////////
+#define test set without ranking
 test_n_rank =   select(test, -c(ranking))
 
+#define random_forest_model
 random_forest_model = randomForest(
   formula = ranking~. ,
   data = train,
-<<<<<<< Updated upstream
-  mtree = 50000,
-  mtry = 4,
-=======
   mtree = 10000,
   mtry = 10,
->>>>>>> Stashed changes
+  split = 8,
   type = "regression"
 )
+
+#Looking at how well we can predict the top X track ranks 
 y_pred_rf = predict(random_forest_model, test_n_rank)
 y_pred_rf_binary =toBinary(y_pred_rf, g_cut_off)
-#caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
-<<<<<<< Updated upstream
-get_metrics(test$rankingX,y_pred_rf, random_forest_model,model_features,1)
+caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
 
-
-=======
+#Compute metrics of random forest regression
 get_metrics(test$ranking,y_pred_rf, random_forest_model,model_features,1)
-
-#summary(random_forest_model)
-
->>>>>>> Stashed changes
 ```
+
+As You can see our random forest model performs quite a bit better then the elastic net reggression and
 
 ```{r}
 
+#Plot elastic regression true_rank vs avg rank
 rf_df = data.frame(y_pred_rf, index)
+
+#
 rf_p = ggplot(rf_df) + 
 geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
 geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
 labs(x= "Song Index", y= "ranking", title = "Random Forest Model Performance") + 
 dark_theme_gray()
-
+plot(random_forest_model)
 rf_p
+
+tree_func(random_forest_model, ) tree_plot
+
 ```
 
-
+The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the random forest regression model.
 ```{r}
-#still needs work
-<<<<<<< Updated upstream
-  #getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
-```
-=======
-  # getEstimatedRank("Love Letter", model_features , random_forest_model, 2)
+#Currently is broken since predict of a random forest returns alot of null variables
+getEstimatedRank("Leo Trix", model_features , random_forest_model, 2)
+
 ```
 
-Extremely poor perfromign linear Regression Model
+With regards to our binary test of top X tracks we should make sure that the distribution of our test isn't skewed. After examining the below graph is it is obvious that the test set of the data was slightly skewed towards worse ranking tracks however, it really is only a slight s
+```{r}
+hist(test$ranking)
+```
+Extremely poor perfroming linear Regression Model that isn't even worth running
 ```{r}
 # #index = c(1:(length(test_n_rank)))
 # train = select_if(train, is.numeric) 
@@ -371,4 +426,3 @@ Extremely poor perfromign linear Regression Model
 
 ```
 
->>>>>>> Stashed changes
