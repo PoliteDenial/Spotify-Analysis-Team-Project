@@ -38,8 +38,38 @@ access_token <- get_spotify_access_token()
 ```
 
 
-Tree graphing function from [here](https://www.r-bloggers.com/2017/03/plotting-trees-from-random-forest-models-with-ggraph/) a
 ```{r}
+set.seed(2022) #Controlled random
+dpath = "clean_data/trackData.csv"#CSV path
+data = read.csv(dpath)#Import data from CSV in the same directory
+
+#////////////////////////////////////////////////////////////////////////////////////////////
+#Are we using pure ranking or ranking avg rank week? 
+#1 if avg rank 0 if just rank
+rank_xor = 0
+#WARNING: If predicing average ranking then every refrence to ranking should be changed to rankingX!
+#If you don't do that none of the code will execute this if statment simply toggles the processing of the data frame.
+if(rank_xor==1){
+    avg = data %>% 
+    group_by(song_name)  %>%  
+    summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
+    mutate(ranking = s_freq / weeks_trending)
+    data = merge(avg, data, by="song_name")
+    data = select(data, -c(week, ranking, id,X,s_freq))
+    data=distinct(data)
+
+}
+
+
+
+```
+
+
+
+
+
+Tree graphing function from [here](https://www.r-bloggers.com/2017/03/plotting-trees-from-random-forest-models-with-ggraph/) has been modified to fit our needs. That being said we did not write any of code and all credit goes to the original author. 
+```{r warn = -1}
 library(ggraph)
 library(igraph)
 tree_func <- function(final_model, 
@@ -68,13 +98,10 @@ tree_func <- function(final_model,
   
   # plot
   plot <- ggraph(graph, 'dendrogram') + 
-    theme_bw() +
     geom_edge_link() +
     geom_node_point() +
     geom_node_text(aes(label = node_label), na.rm = TRUE, repel = TRUE) +
     geom_node_label(aes(label = split), vjust = 2.5, na.rm = TRUE, fill = "white") +
-    geom_node_label(aes(label = leaf_label, fill = leaf_label), na.rm = TRUE, 
-                    repel = TRUE, colour = "white", fontface = "bold", show.legend = FALSE) +
     theme(panel.grid.minor = element_blank(),
           panel.grid.major = element_blank(),
           panel.background = element_blank(),
@@ -86,48 +113,21 @@ tree_func <- function(final_model,
           axis.ticks = element_blank(),
           axis.title.x = element_blank(),
           axis.title.y = element_blank(),
-          plot.title = element_text(size = 18))
+          plot.title = element_text(size = 18)) + dark_theme_dark()
   
   print(plot)
 }
 ```
-```{r}
-set.seed(2022) #Controlled random
-dpath = "clean_data/trackData.csv"#CSV path
-data = read.csv(dpath)#Import data from CSV in the same directory
 
-#////////////////////////////////////////////////////////////////////////////////////////////
-#Are we using pure ranking or ranking avg rank week? 
-#1 if avg rank 0 if just rank
-rank_xor = 0
-
-#Wa
-if(rank_xor==1){
-    avg = data %>% 
-    group_by(song_name)  %>%  
-    summarise(s_freq = sum(ranking), weeks_trending = n()) %>% 
-    mutate(ranking = s_freq / weeks_trending)
-    data = merge(avg, data, by="song_name")
-    data = select(data, -c(week, ranking, id,X,s_freq))
-    data=distinct(data)
-
-}
-
-
-
-```
-
-```{r}
-#This cell contains primarily contains functions that we use throughout the anaylsis process:
-
-
+This cell contains primarily contains functions that we use throughout the anaylsis process:
+```{r warn = -1}
 #////////////////////////////////////////////////////////////////////////////////////////////////
 
 #Searchs spotify for a song and given a model predict is value using that model
-#model_type defines mo
-# elastic net/ lasso/ridge =1
+#model_type refrence:
+# elastic net/ lasso/ridge/linear/log/etc = 1
 # random forest = 2
-# If it requires a lamda value then chose 1...
+# If it requires a lamda value then chose 1 otherwise chose 2
 
 getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type = 0, lambda = 0)
 {
@@ -135,20 +135,30 @@ getEstimatedRank = function(song_query = "", mf = "", modelObj,  model_type = 0,
   id = new["id"][[1]][1]
   track = get_track_audio_features(id)
   track = track[mf]
-  view(track)
   new_track = matrix(as_vector(track),nrow = 1, ncol = length(mf))
   
   if(model_type == 1){
-    predict(modelObj,s = lambda, newx = new_track)
+    p_vec = predict(modelObj,s = lambda, newx = new_track)
+      return(cat("\n////////////////////////////////////////////",
+      "\nGiven song ",
+      song_query, 
+      "\nThe model predicted the value: ",
+      p_vec,
+      "\n////////////////////////////////////////////\n"))
   }else if(model_type == 2){
-    l = as.vector(predict(modelObj, newx = new_track))
-    return(mean(tail(l, n=20)))
+    p_vec = as.vector(predict(modelObj, newx = new_track))
+    t_mean= mean(tail(p_vec, n=50))
+      return(cat("\n////////////////////////////////////////////",
+      "\nGiven song ",
+      song_query, 
+      "\nThe model predicted the value: ",
+      t_mean,
+      "\n////////////////////////////////////////////\n"))
   }else{
     cat("\nInvalid model type!","\nTry 1 or 2")
   }
   
 }
-
 #////////////////////////////////////////////////////////////////////////////////////////////////
 #convert a set of values to 0,1  given a cutoff value ie 10 <= 50 therefore return 1
 toBinary = function(data, cut_off) 
@@ -282,6 +292,8 @@ true_rank = test$ranking
 #////////////////////////////////////////////////////////////////////////////////////////////////
 ```
 
+
+
 ```{r,warn = -1}
 #Lasso vars
 y <- train$ranking # nolint
@@ -312,7 +324,7 @@ g_cut_off = 50 #cut off point for binary representations
 
 #How well do we perfrom at detecting the top 1:X tracks...
 y_hat_binary =toBinary(y_predicted, g_cut_off)
-true_rank_binary = toBinary(y_test, g_cut_off)
+true_rank_binary = toBinary(test$ranking, g_cut_off)
 caret::confusionMatrix(as.factor(y_hat_binary),as.factor(true_rank_binary)) 
 
 #////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,15 +357,12 @@ The function below allows you to search for a song in the spotify catalog and us
 getEstimatedRank("Good Leo Trix", model_features , elastic_model , 1 , best_lambda)
 ```
 
-
-
 Using random forest for our regression model we get significantly better performance with a RMSE of 22.9 after running 1e5 iterations of the tree.
 
-```{r}
+```{r, warn = -1}
 #////////////////////////////////////////////////////////////////////////////////////////////////
 #define test set without ranking
 test_n_rank =   select(test, -c(ranking))
-
 #define random_forest_model
 random_forest_model = randomForest(
   formula = ranking~. ,
@@ -373,54 +382,32 @@ caret::confusionMatrix(as.factor(y_pred_rf_binary), as.factor(true_rank_binary))
 get_metrics(test$ranking,y_pred_rf, random_forest_model,model_features,1)
 ```
 
-As You can see our random forest model performs quite a bit better then the elastic net reggression and
+As You can see our random forest model performs quite a bit better then the elastic net reggression.
 
 ```{r}
 
-#Plot rf true_rank vs avg rank
+#Plot rf true_rank vs rank
 rf_df = data.frame(y_pred_rf, index)
 
-#
 rf_p = ggplot(rf_df) + 
 geom_point(aes(y=y_pred_rf, x=index, colour = "Predicted Rank")) +  
-geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
+geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
 labs(x= "Song Index", y= "ranking", title = "Random Forest Model Performance") + 
 dark_theme_gray()
 plot(random_forest_model)
 rf_p
 #Plot rf tree 1/10
 tree_func(random_forest_model, 1)
-
 ```
 
-The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the random forest regression model.
+The function below allows you to search for a song in the spotify catalog and using one of the models that we created output the prediction of that particular song. This particular call of the function is set to use the random forest regression model. It is currently broken since predictions of a random forest track ranking is hard extract given such a small input set. 
 ```{r}
-#Currently is broken since predict of a random forest returns alot of null variables
-getEstimatedRank("Leo Trix", model_features , random_forest_model, 2)
-
+#Song should return a relatively low value but gives the same return regardless of input song
+getEstimatedRank("Good Leo Trix", model_features , random_forest_model, 2)
 ```
 
-With regards to our binary test of top X tracks we should make sure that the distribution of our test isn't skewed. After examining the below graph is it is obvious that the test set of the data was slightly skewed towards worse ranking tracks however, it really is only a slight s
+With regards to our binary test of top X tracks we should make sure that the distribution of our test isn't skewed. After examining the below graph is it is obvious that the test set of the data was slightly skewed towards worse ranking tracks however, it really is only a slight skewed meaning that our binary representations and therefore our accuracy tests aren't completely off base. However in the future it would be best to sample a normal distribution of values for our test set atleast for this case specifically.
 ```{r}
 hist(test$ranking)
 ```
-Extremely poor perfroming linear Regression Model that isn't even worth running
-```{r}
-# #index = c(1:(length(test_n_rank)))
-# train = select_if(train, is.numeric) 
-# linear_model = glm(formula = ranking ~., data = train)
-# l_pred = predict(linear_model,test)
-
-# get_metrics(true_rank,l_pred, linear_model ,model_features)
-
-# l_df = data.frame(l_pred, index)
-# l_p = ggplot(l_df) + 
-# geom_point(aes(y=l_pred, x=index, colour = "Predicted Rank")) +  
-# geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + geom_line(aes(y=true_rank, x=index, colour = "Actual Rank")) + 
-# labs(x= "Song Index", y= "Ranking", title = "Linear Model Performance") + 
-# dark_theme_gray()
-
-# l_p
-
-```
-
