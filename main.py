@@ -1,28 +1,9 @@
-import streamlit as st
+import streamlit as sl
 import pandas as pd
+sl.title("Spotify Data Science"
 
-
-#st.title("Whats trending in Denver?")
-#st.write("We used the spotify api to get the top unique songs in Denver over the span of the last few months.")
-#
-#
-#st.write("This is a graph of the top songs in Denver over the last few months.")
-
-
-uploaded_file = st.file_uploader("Choose a file")
-if uploaded_file is not None:
-     # To read file as bytes:
-     bytes_data = uploaded_file.getvalue()
-     st.write(bytes_data)
-
-     # To convert to a string based IO:
-     stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
-     st.write(stringio)
-
-     # To read file as string:
-     string_data = stringio.read()
-     st.write(string_data)
-
-     # Can be used wherever a "file-like" object is accepted:
-     dataframe = pd.read_csv(uploaded_file)
-     st.write(dataframe)
+sl.write("The overall goal of this analysis is to determine statistically significant correlations between a particular song metrics or “Audio Features” and the probability that a certain mood of the song will have an increase in the number of plays over time.")
+sl.markdown("# Spotify Data Science")
+sl.markdown("- The overall goal of this analysis is to determine statistically significant correlations between a particular song metrics or “Audio Features” and the probability that a certain mood of the song will have an increase in the number of plays over time.- What metrics can be used to measure the likelihood of a song “trending”?- Typically what songs trend in a particular region?- How can we predict the kind of songs that will be popular in the future?- Can machine learning models and regression models be applied to accurately predict a songs chart ranking in a region?")
+sl.markdown("## Presenation Slides:![](./ppt_pres/pres_slow.gif)- Please note that under the **/ppt_pres/** folder the slides can be downloaded in 3 formats, with the PDF being the highest quality.")")
+  
