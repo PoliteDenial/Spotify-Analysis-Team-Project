@@ -1,6 +1,6 @@
 import streamlit as sl
 import pandas as pd
-sl.title("Spotify Data Science"
+sl.title("Spotify Data Science")
 
 sl.write("The overall goal of this analysis is to determine statistically significant correlations between a particular song metrics or “Audio Features” and the probability that a certain mood of the song will have an increase in the number of plays over time.")
 sl.markdown("# Spotify Data Science")
