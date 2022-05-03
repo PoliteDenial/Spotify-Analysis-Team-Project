@@ -59,7 +59,7 @@ if(rank_xor==1){
     data=distinct(data)
 
 }
-
+head(data)
 
 
 ```
@@ -69,7 +69,7 @@ if(rank_xor==1){
 
 
 Tree graphing function from [here](https://www.r-bloggers.com/2017/03/plotting-trees-from-random-forest-models-with-ggraph/) has been modified to fit our needs. That being said we did not write any of code and all credit goes to the original author. 
-```{r warn = -1}
+```{r, warn = -1}
 library(ggraph)
 library(igraph)
 tree_func <- function(final_model, 
@@ -249,16 +249,16 @@ corMap = ggplot(m_cor_mat_f, aes(Var1, Var2, fill = value)) +
 corMap
 ```
 
-From here we want to take a look at the features that when compared to rank column have the strongest  correlations both negative and postive depending on the way in which the value is formatted. So if we look at the far right column we can see that very clearly there are postive correlations primarily between rank and danceability along with rank and valence. We generally want to look for negative correlations since the lower a songs rank is the closer it is to the number one spot on the charts. That being said within our data set it looks to be the case that energy, loudness, instrumentalness, livelness and duration are correlated with a "high" rank or is more likely to be on the upper section of the charts.
+From here we want to take a look at the features that when compared to rank column have the strongest  correlations both negative and postie depending on the way in which the value is formatted. So if we look at the far right column we can see that very clearly there are postie correlations primarily between rank and danceability along with rank and valence. We generally want to look for negative correlations since the lower a songs rank is the closer it is to the number one spot on the charts. That being said within our data set it looks to be the case that energy, loudness, instrumentalness, liveliness and duration are correlated with a "high" rank or is more likely to be on the upper section of the charts.
 
 
-As disscussed above and shown by our correlation heatmap, the most relevant freatures to use to predict a song will be popular are energy, loudness, instrumentalness, livelness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
+As discussed above and shown by our correlation heat map, the most relevant features to use to predict a song will be popular are energy, loudness, instrumentalness, liveliness, and duration. Additionally to predict that song will be unpopular we also be adding in danceability, and valence to ensure the model is balanced. 
 
-Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Intailly we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. We also tried using ridge regression then elastic net but this also gave us less then perfect results.
+Now that brings us to the task of deciding on what kind machine learning model we should use in order to predict a songs popularity in Denver. Initially we ended up trying lasso regression to automate the process of selecting features automated however this led to quite poor results. We also tried using ridge regression then elastic net but this also gave us less then perfect results.
 
 
 
-The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremly low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
+The code below is for that ridge/elastic net/lasso regression this and as can be seen in the console the the $R^2$ value is extremely low meaning that this certainly isn't the correct approach for this kind of a data set since it's quite noisey. 
 
 ```{r}
 
@@ -384,7 +384,7 @@ get_metrics(test$ranking,y_pred_rf, random_forest_model,model_features,1)
 
 As You can see our random forest model performs quite a bit better then the elastic net reggression.
 
-```{r}
+```{r, warn = -1}
 
 #Plot rf true_rank vs rank
 rf_df = data.frame(y_pred_rf, index)

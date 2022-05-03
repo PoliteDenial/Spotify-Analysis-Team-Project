@@ -101,10 +101,10 @@ Here's where we can actually start to interact with the spotify Web API, to do t
 
 ```{r} 
 id ='71e950603dd64e1291d04fabafee04d9'
-secret = '5331da62c4644ee887ff07216c35b183'
+secret = '4a8f958cd10448e7aba2aaed03280140'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
-access_token <- get_spotify_access_token() #
+access_token <- get_spotify_access_token()  #
 ```
 
 
@@ -166,26 +166,18 @@ key_to_df <-function(x){
 This is where we actually call our function above to get the song keys from the raw Html then contact the API to get information from a song and finally, generate a data-frame:
 
 ```{r} 
-raw_html_file_name = "raw_data/AutoData.txt"
-songKeys = scrape_table(raw_html_file_name)
-songKeys
-trackDf = key_to_df(songKeys)
-head(trackDf)
+#Again all function work this is commented out just to knit without it re generating our csv
+#raw_html_file_name = "raw_data/AutoData.txt"
+#songKeys = scrape_table(raw_html_file_name)
+#songKeys
+#trackDf = key_to_df(songKeys) 
+#head(trackDf)
 ```
 
 
 Finally we export at all to a csv so we don't have to use these computationally heavy functions multiple times.
 ```{r}
-path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_proj\\clean_data\\trackData.csv"
-res = write.csv(trackDf,path_to_csv)
-```
-
-Quick function to graph the average values
-
-```{r}
-avg_grapher <- function(trackDf){
-  ggplot(aes)
-  
-}
+#path_to_csv = "C:\\Users\\zaine\\OneDrive\\Desktop\\School\\STAT\\spotify_data_proj\\clean_data\\trackData.csv"
+#res = write.csv(trackDf,path_to_csv) #Again works commented out just to knit
 ```
 
